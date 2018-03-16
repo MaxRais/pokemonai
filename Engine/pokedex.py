@@ -166,3 +166,4 @@ pokedex_list = {
 "DRAGONITE" : Template(149,"Dragonite",["DRAGON","FLYING"],[0.5,0.5,0],[91,134,95,100,100,80],["INNER FOCUS","MULTISCALE"]),
 "MEWTWO" : Template(150,"Mewtwo",["PSYCHIC"],[0,0,1],[106,110,90,154,90,130],["PRESSURE","UNNERVE"]),
 "MEW" : Template(151,"Mew",["PSYCHIC"],[0,0,1],[100,100,100,100,100,100],["SYNCHRONIZE"])
+}

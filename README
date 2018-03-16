@@ -1,3 +1,6 @@
 Pokemon Gen 1 AI using minimax & expectimax with alpha-beta pruning
 
+*** To run***
+python Engine/main.py
+
 Max Rais & Theodore Tsapakos

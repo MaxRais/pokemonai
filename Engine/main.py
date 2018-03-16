@@ -12,7 +12,10 @@ def main(team1file, team2file, team1player, team2player):
 	print ("Winner: " + str(result))
 
 if (__name__ == "__main__"):
-	main("./tests/testteam.txt", "./tests/testteam.txt", player.RandomAI("player 1"), player.RandomAI("player 2"))
+	main("./Engine/tests/testteam.txt",
+		 "./Engine/tests/testteam.txt",
+		 player.HumanPlayer("player 1"),
+		 player.RandomAI("player 2"))
 	# main("./tests/testteam.txt", "./tests/testteam.txt", player.RandomAI("player 1"), player.RandomAI("player 2"))
 	# main("./tests/testteam.txt", "./tests/testteam.txt", player.RandomAI("player 1"), player.RandomAI("player 2"))
 	# main("./tests/testteam.txt", "./tests/testteam.txt", player.RandomAI("player 1"), player.RandomAI("player 2"))
