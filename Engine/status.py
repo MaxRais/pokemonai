@@ -67,7 +67,7 @@ def SLPonBeforeMove(pokemon, target, move):
 	if (pokemon.ability == "EARLYBIRD"):
 		pokemon.decrement_status_counter()
 	pokemon.decrement_status_counter()
-	if (pokemon.get_status_counter <= 0):
+	if (pokemon.get_status_counter() <= 0):
 		pokemon.cure_status()
 		log.message(pokemon.template.species + " woke up")
 		# return (True,)
@@ -83,7 +83,7 @@ def FRZonStart(target):
 	if (target.set_status(FRZ)):
 		log.message(target.template.species + " was frozen solid")
 def FRZonBeforeMove(pokemon, target, move):
-	if (move.flags["DEFROST"]):
+	if ("DEFROST" in move.flags):
 		log.message(pokemon.template.species + " thawed out")
 		pokemon.cure_status()
 		# return (True, )
@@ -120,7 +120,7 @@ def TOXonStart(target, source, sourceEffect):
 def TOXonSwitchIn():
 	target.set_status_counter(0)
 def TOXonResidual(pokemon):
-	if (pokemon.get_status_counter < 15):
+	if (pokemon.get_status_counter() < 15):
 		pokemon.increment_status_counter()
 	log.message(pokemon.template.species + " was hurt by poison")
 	pokemon.damage((pokemon.max_hp / 16) * pokemon.get_status_counter())
