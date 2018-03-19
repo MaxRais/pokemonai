@@ -1,5 +1,4 @@
 import fakerandom
-import weather
 import log
 
 # statuses
@@ -49,8 +48,7 @@ def PARonStart(target):
 	if (target.set_status(PAR)):
 		log.message(target.template.species + " was paralyzed")
 def PARonModifySpe(speMod, pokemon):
-	if (not pokemon.ability == "QUICKFEET"):
-		return speMod * 0.25
+	pass
 def PARonBeforeMove(pokemon, target = None, move = None):
 	if (fakerandom.fakerandom() < 0.25):
 		log.message(pokemon.template.species + " was paralyzed and couldn't move")
@@ -64,8 +62,6 @@ def SLPonStart(target):
 		log.message(target.template.species + " fell asleep")
 		target.set_status_counter(fakerandom.fakerandint(1, 3))
 def SLPonBeforeMove(pokemon, target, move):
-	if (pokemon.ability == "EARLYBIRD"):
-		pokemon.decrement_status_counter()
 	pokemon.decrement_status_counter()
 	if (pokemon.get_status_counter() <= 0):
 		pokemon.cure_status()
@@ -147,16 +143,6 @@ def CONFUSIONonBeforeMove(pokemon, target = None, move = None):
 	# return (False, CONFUSION)
 	return False
 
-# def FLINCHonStart(target): # may need to add - not in javascript version
-# 	target.add_volatile("FLINCH")
-def FLINCHonBeforeMove(pokemon, target = None, move = None):
-	# target.remove_volatile("FLINCH")
-	log.message(pokemon.template.species + " flinched")
-	# return (False, FLINCH)
-	return False
-def FLINCHonEnd(pokemon): # may need to add - not in javascript version
-	target.remove_volatile("FLINCH")
-
 # trapped: {
 # 		noCopy: true,
 # 		onTrySwitchAction: function (pokemon) {
@@ -171,10 +157,7 @@ def FLINCHonEnd(pokemon): # may need to add - not in javascript version
 # 	},
 
 def PARTIALLYTRAPPEDonStart(pokemon, source):
-	if (source.item == "GRIPCLAW"):
-		pokemon.partiallytrapped_count = 8
-	else:
-		pokemon.partiallytrapped_count = fakerandom.fakerandint(5, 7)
+	pokemon.partiallytrapped_count = fakerandom.fakerandint(5, 7)
 	if (pokemon.add_volatile(PARTIALLYTRAPPED)):
 		log.message(pokemon.template.species + " was trapped")
 		pokemon.partiallytrapped_source = source
@@ -184,10 +167,7 @@ def PARTIALLYTRAPPEDonResidual(pokemon):
 		pokemon.remove_volatile(PARTIALLYTRAPPED)
 		return
 	log.message(pokemon.template.species + " was hurt by the trap")
-	if (pokemon.partiallytrapped_source.item == "BINDINGBAND"):
-		pokemon.damage(pokemon.max_hp / 6)
-	else:
-		pokemon.damage(pokemon.max_hp / 8)
+	pokemon.damage(pokemon.max_hp / 8)
 # def PARTIALLYTRAPPEDonEnd(pokemon):
 # 	pokemon.add_volatile(PARTIALLYTRAPPED)
 def PARTIALLYTRAPPEDonTrySwitchAction(pokemon):
@@ -378,23 +358,6 @@ def TWOTURNMOVEonEnd(target):
 	# },
 
 	# weather is implemented here since it's so important to the game
-
-def RAINDANCEonStart(source):
-	weather.set_weather(weather.RAINDANCE, 5)
-	if (source and source.item == "DAMPROCK"):
-		weather.set_weather(weather.RAINDANCE, 8)
-	if (source.ability == "DRIZZLE"):
-		weather.set_weather(weather.RAINDANCE, -1)
-def RAINDANCEonBasePower(basePower, attacker, defender, move):
-	if (move.element == "WATER"):
-		return 1.5 * basePower
-	if (move.element == "FIRE"):
-		return 0.5 * basePower
-def RAINDANCEonResidual():
-	weather.decrement_weather()
-def RAINDANCEonEnd():
-	if (weather.get_weather_countdown() == 0):
-		weather.clear_weather()
 	# primordialsea: {
 	# 	effectType: 'Weather',
 	# 	duration: 0,
@@ -424,25 +387,6 @@ def RAINDANCEonEnd():
 	# 	}
 	# },
 
-def SUNNYDAYonStart(source):
-	weather.set_weather(weather.SUNNYDAY, 5)
-	if (source and source.item == "HEATROCK"):
-		weather.set_weather(weather.SUNNYDAY, 8)
-	if (source.ability == "DROUGHT"):
-		weather.set_weather(weather.SUNNYDAY, -1)
-def SUNNYDAYonBasePower(basePower, attacker, defender, move):
-	if (move.element == "FIRE"):
-		return basePower * 1.5
-	if (move.element == "WATER"):
-		return basePower * 0.5
-def SUNNYDAYonImmunity(element): # not sure if this is necessary - took it from js version
-	if (element == "ICE"):
-		return False
-def SUNNYDAYonResidual():
-	weather.decrement_weather()
-def SUNNYDAYonEnd():
-	if (weather.get_weather_countdown() == 0):
-		weather.clear_weather()
 	# desolateland: {
 	# 	effectType: 'Weather',
 	# 	duration: 0,
@@ -604,7 +548,6 @@ battle_status = {
 	"PSN" : BattleStatus("PSN", "STATUS", onStart = PSNonStart, onResidualOrder = 9, onResidual = PSNonResidual),
 	"TOX" : BattleStatus("TOX", "STATUS", onStart = TOXonStart, onSwitchIn = TOXonSwitchIn, onResidualOrder = 9, onResidual = TOXonResidual),
 	"CONFUSION" : BattleStatus("CONFUSION", "VOLATILE", onStart = CONFUSIONonStart, onBeforeMovePriority = 3, onBeforeMove = CONFUSIONonBeforeMove),#, onEnd = CONFUSIONonEnd),
-	"FLINCH" : BattleStatus("FLINCH", "VOLATILE", onBeforeMovePriority = 8, onBeforeMove = FLINCHonBeforeMove),
 	# "TRAPPED" : BattleStatus("TRAPPED", "VOLATILE", noCopy = True, onTrySwitchAction = TRAPPEDonTrySwitchAction, onStart = TRAPPEDonStart),
 	# "TRAPPER" : BattleStatus("TRAPPER", "VOLATILE", noCopy = True),
 	"PARTIALLYTRAPPED" : BattleStatus("PARTIALLYTRAPPED", "VOLATILE", onStart = PARTIALLYTRAPPEDonStart, onResidualOrder = 11, onResidual = PARTIALLYTRAPPEDonResidual, onTrySwitchAction = PARTIALLYTRAPPEDonTrySwitchAction),#, onEnd = PARTIALLYTRAPPEDonEnd),
@@ -616,9 +559,7 @@ battle_status = {
 	# "STALL" : BattleStatus("STALL", "VOLATILE", onStart = STALLonStart, onStallMove = STALLonStallMove, onRestart = STALLonRestart),
 	# "GEM" : BattleStatus("GEM", "VOLATILE", onBasePower = GEMonBasePower),
 	# "AURA" : BattleStatus("AURA", "VOLATILE", onBasePowerPriority = 8, onBasePower = AURAonBasePower),
-	"RAINDANCE" : BattleStatus("RAINDANCE", "WEATHER", onStart = RAINDANCEonStart, onBasePower = RAINDANCEonBasePower, onResidualOrder = 1, onResidual = RAINDANCEonResidual, onEnd = RAINDANCEonEnd),
 	# "PRIMORDIALSEA" : BattleStatus("PRIMORDIALSEA", "WEATHER", onTryMove = PRIMORDIALSEAonTryMove, onBasePower = PRIMORDIALSEAonBasePower, onStart = PRIMORDIALSEAonStart, onResidualOrder = 1, onResidual = PRIMORDIALSEAonResidual, onEnd = PRIMORDIALSEAonEnd),
-	"SUNNYDAY" : BattleStatus("SUNNYDAY", "WEATHER", onBasePower = SUNNYDAYonBasePower, onStart = SUNNYDAYonStart, onImmunity = SUNNYDAYonImmunity, onResidualOrder = 1, onResidual = SUNNYDAYonResidual, onEnd = SUNNYDAYonEnd),
 	# "DESOLATELAND" : BattleStatus("DESOLATELAND", "WEATHER", onTryMove = DESOLATELANDonTryMove, onBasePower = DESOLATELANDonBasePower, onStart = DESOLATELANDonStart, onImmunity = DESOLATELANDonImmunity, onResidualOrder = 1, onResidual = DESOLATELANDonResidual, onEnd = DESOLATELANDonEnd),
 	# "SANDSTORM" : BattleStatus("SANDSTORM", "WEATHER", onModifySpDPriority = 10, onModifySpD = SANDSTORMonModifySpD, onStart = SANDSTORMonStart, onResidualOrder = 1, onResidual = SANDSTORMonResidual, onWeather = SANDSTORMonWeather, onEnd = SANDSTORMonEnd),
 	# "HAIL" : BattleStatus("HAIL", "WEATHER", onStart = HAILonStart, onResidualOrder = 1, onResidual = HAILonResidual, onWeather = HAILonWeather, onEnd = HAILonEnd),

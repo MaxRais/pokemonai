@@ -14,6 +14,7 @@ class Template:
 		self.base_spe = base_stats[5]
 		self.abilities = abilities
 
+### TODO: Update stats, remove abilities, force same spa and spd
 pokedex_list = {
 "BULBASAUR" : Template(1,"Bulbasaur",["GRASS","POISON"],[0.875,0.125,0],[45,49,49,65,65,45],["OVERGROW","CHLOROPHYLL"]),
 "IVYSAUR" : Template(2,"Ivysaur",["GRASS","POISON"],[0.875,0.125,0],[60,62,63,80,80,60],["OVERGROW","CHLOROPHYLL"]),

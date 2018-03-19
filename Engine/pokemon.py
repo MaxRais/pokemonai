@@ -2,7 +2,6 @@ import pokedex
 import moves
 import copy
 import learnsets
-import natures
 import debug
 import status
 import ai
@@ -18,53 +17,19 @@ ACC = "ACC"
 EVA = "EVA"
 
 def get_hp_element(ivs):
-	hp_element = int(((ivs[0] % 2 + 2 * (ivs[1] % 2) + 4 * (ivs[2] % 2) + 8 * (ivs[5] % 2) + 16 * (ivs[3] % 2) + 32 * (ivs[4] % 2)) * 15) / 63)
-	if (hp_element == 0):
-		return "FIGHTING"
-	if (hp_element == 1):
-		return "FLYING"
-	if (hp_element == 2):
-		return "POISON"
-	if (hp_element == 3):
-		return "GROUND"
-	if (hp_element == 4):
-		return "ROCK"
-	if (hp_element == 5):
-		return "BUG"
-	if (hp_element == 6):
-		return "GHOST"
-	if (hp_element == 7):
-		return "STEEL"
-	if (hp_element == 8):
-		return "FIRE"
-	if (hp_element == 9):
-		return "WATER"
-	if (hp_element == 10):
-		return "GRASS"
-	if (hp_element == 11):
-		return "ELECTRIC"
-	if (hp_element == 12):
-		return "PSYCHIC"
-	if (hp_element == 13):
-		return "ICE"
-	if (hp_element == 14):
-		return "DRAGON"
-	if (hp_element == 15):
-		return "DARK"
+	return "NORMAL"
 
 class Pokemon:
-	def __init__(self, species, level, ivs, evs, techniques, nature, gender, ability, item): # had to rename init variable "moves" to "techniques" to solve a naming conflict
+	def __init__(self, species, level, ivs, evs, techniques, gender): # had to rename init variable "moves" to "techniques" to solve a naming conflict
 		self.template = pokedex.pokedex_list[species]
 		self.level = level
-		self.nature = nature
-		self.nature_dict = natures.nature_list[nature]
 		self.max_hp = int((((ivs[0] + (2 * self.template.base_hp) + int(evs[0] / 4) + 100) * level) / 100) + 10)
 		self.hp = self.max_hp
-		self.attack = int(((((ivs[1] + (2 * self.template.base_atk) + int(evs[1] / 4)) * level) / 100) + 5) * self.nature_dict["ATK"])
-		self.defence = int(((((ivs[2] + (2 * self.template.base_def) + int(evs[2] / 4)) * level) / 100) + 5) * self.nature_dict["DEF"])
-		self.spattack = int(((((ivs[3] + (2 * self.template.base_spa) + int(evs[3] / 4)) * level) / 100) + 5) * self.nature_dict["SPA"])
-		self.spdefence = int(((((ivs[4] + (2 * self.template.base_spd) + int(evs[4] / 4)) * level) / 100) + 5) * self.nature_dict["SPD"])
-		self.speed = int(((((ivs[5] + (2 * self.template.base_spe) + int(evs[5] / 4)) * level) / 100) + 5) * self.nature_dict["SPE"])
+		self.attack = int(((((ivs[1] + (2 * self.template.base_atk) + int(evs[1] / 4)) * level) / 100) + 5))
+		self.defence = int(((((ivs[2] + (2 * self.template.base_def) + int(evs[2] / 4)) * level) / 100) + 5))
+		self.spattack = int(((((ivs[3] + (2 * self.template.base_spa) + int(evs[3] / 4)) * level) / 100) + 5))
+		self.spdefence = int(((((ivs[4] + (2 * self.template.base_spd) + int(evs[4] / 4)) * level) / 100) + 5))
+		self.speed = int(((((ivs[5] + (2 * self.template.base_spe) + int(evs[5] / 4)) * level) / 100) + 5))
 
 		self.atk_stage = 0
 		self.def_stage = 0
@@ -80,8 +45,6 @@ class Pokemon:
 		self.status_source = None
 
 		self.gender = gender
-		self.ability = ability
-		self.item = item
 
 		self.trapped = False
 		self.maybe_trapped = False
@@ -354,11 +317,6 @@ def get_pokemon_from_list(pokemonlist):
 			if (not atk4 in learnsets.learnset_list[species]):
 				debug.db(dbflag, atk4 + " is not a valid move for " + species)
 				return None
-		elif (formattedline[:6] == "[ITEM]"):
-			if (formattedline[6:] == "NONE"):
-				item = None
-			else:
-				item = formattedline[6:]
 		elif (formattedline[:7] == "[ATKIV]"):
 			atkiv = int(formattedline[7:])
 			if (0 > atkiv > 31):
@@ -409,18 +367,14 @@ def get_pokemon_from_list(pokemonlist):
 			if (0 > ppup4 > 3):
 				debug.db(dbflag, "PPUP4 " + str(ppup4) + " is out of range for move4 for " + species)
 				return None
-		elif (formattedline[:8] == "[NATURE]"):
-			nature = formattedline[8:]
 		elif (formattedline[:8] == "[GENDER]"):
 			if (formattedline[8:] == "NONE"):
 				gender = None
 			else:
 				gender = formattedline[8:]
-		elif (formattedline[:9] == "[ABILITY]"):
-			ability = formattedline[9:]
 		elif (formattedline[:9] == "[SPECIES]"):
 			species = formattedline[9:]
 	if (hpev + atkev + defev + spaev + spdev + speev > 510):
 		debug.db(dbflag, "EV total out of range for " + species)
 		return None
-	return Pokemon(species, level, [hpiv, atkiv, defiv, spaiv, spdiv, speiv], [hpev, atkev, defev, spaev, spdev, speev], [(atk1, ppup1), (atk2, ppup2), (atk3, ppup3), (atk4, ppup4)], nature, gender, ability, item)
+	return Pokemon(species, level, [hpiv, atkiv, defiv, spaiv, spdiv, speiv], [hpev, atkev, defev, spaev, spdev, speev], [(atk1, ppup1), (atk2, ppup2), (atk3, ppup3), (atk4, ppup4)], gender)

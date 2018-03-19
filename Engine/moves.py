@@ -1,4 +1,3 @@
-import weather
 import status
 import log
 
@@ -46,13 +45,10 @@ class Modifier:
 		self.amount = amount # number of levels stat increases/decreases, or if it's a status move, number of turns to be afflicted (e.g. rest=>3)
 
 def BLIZZARDonMoveAccuracy():
-	if (weather.get_weather() == weather.HAIL):
-		return -1
-	else:
-		return 1
+	return 1
 
 def RAINDANCEonStart(target):
-	weather.set_weather(weather.RAINDANCE, 5)
+	pass
 
 def RESTonHit(target):
 	if (target.hp >= target.max_hp or not target.set_status(status.SLP, True)):
@@ -74,34 +70,24 @@ def SOLARBEAMonTry(attacker, defender, move):
 	if (attacker.remove_volatile(status.TWOTURNMOVE)):
 		# return (True,)
 		return True
-	if (weather.get_weather() in [weather.SUNNYDAY, weather.DESOLATELAND]):
-		# return (True,)
-		return True
 	attacker.add_volatile(status.TWOTURNMOVE, "SOLARBEAM")
 	log.message(attacker.template.species + " is gathering light")
 	# return (False, " is gathering sunlight")
 	return False
 def SOLARBEAMonBasePower(base_power, pokemon, target):
-	if (weather.get_weather() in [weather.RAINDANCE, weather.PRIMORDIALSEA, weather.SANDSTORM, weather.HAIL]):
-		return base_power * 0.5
+	pass
 
 def SUNNYDAYonStart(target):
-	weather.set_weather(weather.SUNNYDAY, 5)
+	pass
 
 def SYNTHESISonHit(pokemon):
-	if (weather.get_weather() in [weather.SUNNYDAY, weather.DESOLATELAND]):
-		pokemon.heal(pokemon.max_hp * 0.667)
-	elif (weather.get_weather() in [weather.RAINDANCE, weather.PRIMORDIALSEA, weather.SANDSTORM, weather.HAIL]):
-		pokemon.heal(pokemon.max_hp * 0.25)
-	else:
-		pokemon.heal(pokemon.max_hp * 0.5)
+	pass
 
 def THUNDERonMoveAccuracy():
-	if (weather.get_weather() in [weather.RAINDANCE, weather.PRIMORDIALSEA]):
-		return -1
-	elif (weather.get_weather() in [weather.SUNNYDAY, weather.DESOLATELAND]):
-		return 5.0/7.0
+	pass
 
+
+### TODO: Add all the moves?
 battle_move = {
 	"AMNESIA" : BattleMoveTemplate(
 		num = 133,
