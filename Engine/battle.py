@@ -308,103 +308,114 @@ class Battle:
 				else:
 					break
 
-			# both players switch (order doesn't matter)
-			if (player1action.action == player.SWITCH and player2action.action == player.SWITCH):
-				self.switch(player1action.user, player1action.target)
-				self.switch(player2action.user, player2action.target)
+			self.play_turn(player1action, player2action)
+			if (self.get_winner() != None):
+				return self.get_winner()
 
-			elif (player1action.action == player.SWITCH or player2action.action == player.SWITCH):
-				# just player 1 switches - takes priority over all moves implemented so far
-				if (player1action.action == player.SWITCH and player1action.user.fainted == False):
-					if (player2action.user.fainted == False):
-						# player2action.target.onBeforeSwitchOut(self.active2, self.active1)
-						self.switch(player1action.user, player1action.target)
 
-					if (player2action.action == player.ATTACK and player2action.user.fainted == False):
-						self.move(player2action.user, self.active1, player2action.target)
+	def play_turn(self, player1action, player2action):
+		# both players switch (order doesn't matter)
+		if (player1action.action == player.SWITCH and player2action.action == player.SWITCH):
+			self.switch(player1action.user, player1action.target)
+			self.switch(player2action.user, player2action.target)
 
-				# just player 2 switches - takes priority over all moves implemented so far
-				if (player2action.action == player.SWITCH and player2action.user.fainted == False):
-					if (player1action.user.fainted == False):
-						# player1action.target.onBeforeSwitchOut(self.active1, self.active2)
-						self.switch(player2action.user, player2action.target)
+		elif (player1action.action == player.SWITCH or player2action.action == player.SWITCH):
+			# just player 1 switches - takes priority over all moves implemented so far
+			if (player1action.action == player.SWITCH and player1action.user.fainted == False):
+				if (player2action.user.fainted == False):
+					# player2action.target.onBeforeSwitchOut(self.active2, self.active1)
+					self.switch(player1action.user, player1action.target)
 
-					if (player1action.action == player.ATTACK and player1action.user.fainted == False):
-						self.move(player1action.user, self.active2, player1action.target)
+				if (player2action.action == player.ATTACK and player2action.user.fainted == False):
+					self.move(player2action.user, self.active1, player2action.target)
 
-			elif (player1action.action == player.ATTACK and player2action.action == player.ATTACK):
-				if (player1action.target.priority == player2action.target.priority):
-					# pokemon 1 is faster
-					# check to see if status affects speed
-					if (self.active1.status.onModifySpe(self.active1.speed, self.active1) > self.active2.status.onModifySpe(self.active2.speed, self.active2)):
-						# pokemon 1 is alive, use move first
-						if (player1action.user.fainted == False):
-							self.move(player1action.user, self.active2, player1action.target)
-						# pokemon 2 is alive, use move second
-						if (player2action.user.fainted == False):
-							self.move(player2action.user, self.active1, player2action.target)
-					# pokemon 2 is faster
-					# check to see if status affects speed
-					elif (self.active1.status.onModifySpe(self.active1.speed, self.active1) < self.active2.status.onModifySpe(self.active2.speed, self.active2)):
-						# pokemon 2 is alive, use move first
-						if (player2action.user.fainted == False):
-							self.move(player2action.user, self.active1, player2action.target)
-						# pokemon 1 is alive, use move second
-						if (player1action.user.fainted == False):
-							self.move(player1action.user, self.active2, player1action.target)
-					# speeds are equal, random order
-					else:
-						if (fakerandom.fakerandom() < 0.5):
-							# pokemon 1 is alive, use move first
-							if (player1action.user.fainted == False):
-								self.move(player1action.user, self.active2, player1action.target)
-							# pokemon 2 is alive, use move second
-							if (player2action.user.fainted == False):
-								self.move(player2action.user, self.active1, player2action.target)
-						else:
-							# pokemon 2 is alive, use move first
-							if (player2action.user.fainted == False):
-								self.move(player2action.user, self.active1, player2action.target)
-							# pokemon 1 is alive, use move second
-							if (player1action.user.fainted == False):
-								self.move(player1action.user, self.active2, player1action.target)
+			# just player 2 switches - takes priority over all moves implemented so far
+			if (player2action.action == player.SWITCH and player2action.user.fainted == False):
+				if (player1action.user.fainted == False):
+					# player1action.target.onBeforeSwitchOut(self.active1, self.active2)
+					self.switch(player2action.user, player2action.target)
 
-				elif (player1action.target.priority > player2action.target.priority):
+				if (player1action.action == player.ATTACK and player1action.user.fainted == False):
+					self.move(player1action.user, self.active2, player1action.target)
+
+		elif (player1action.action == player.ATTACK and player2action.action == player.ATTACK):
+			if (player1action.target.priority == player2action.target.priority):
+				# pokemon 1 is faster
+				# check to see if status affects speed
+				if (self.active1.status.onModifySpe(self.active1.speed, self.active1) > self.active2.status.onModifySpe(
+						self.active2.speed, self.active2)):
 					# pokemon 1 is alive, use move first
 					if (player1action.user.fainted == False):
 						self.move(player1action.user, self.active2, player1action.target)
 					# pokemon 2 is alive, use move second
 					if (player2action.user.fainted == False):
 						self.move(player2action.user, self.active1, player2action.target)
-				else:
+				# pokemon 2 is faster
+				# check to see if status affects speed
+				elif (
+					self.active1.status.onModifySpe(self.active1.speed, self.active1) < self.active2.status.onModifySpe(
+						self.active2.speed, self.active2)):
 					# pokemon 2 is alive, use move first
 					if (player2action.user.fainted == False):
 						self.move(player2action.user, self.active1, player2action.target)
 					# pokemon 1 is alive, use move second
 					if (player1action.user.fainted == False):
 						self.move(player1action.user, self.active2, player1action.target)
+				# speeds are equal, random order
+				else:
+					if (fakerandom.fakerandom() < 0.5):
+						# pokemon 1 is alive, use move first
+						if (player1action.user.fainted == False):
+							self.move(player1action.user, self.active2, player1action.target)
+						# pokemon 2 is alive, use move second
+						if (player2action.user.fainted == False):
+							self.move(player2action.user, self.active1, player2action.target)
+					else:
+						# pokemon 2 is alive, use move first
+						if (player2action.user.fainted == False):
+							self.move(player2action.user, self.active1, player2action.target)
+						# pokemon 1 is alive, use move second
+						if (player1action.user.fainted == False):
+							self.move(player1action.user, self.active2, player1action.target)
 
-				if (self.get_winner() != None):
-					break
-
-				player1switchin = None
-				player2switchin = None
-				if (player1action.user.fainted == True):
-					player1switchin = self.player1.get_fainted_switch(self)
-				if (player2action.user.fainted == True):
-					player2switchin = self.player2.get_fainted_switch(self)
-				if (player1switchin != None):
-					self.switch(player1action.user, player1switchin)
-				if (player2switchin != None):
-					self.switch(player2action.user, player2switchin)
-
+			elif (player1action.target.priority > player2action.target.priority):
+				# pokemon 1 is alive, use move first
+				if (player1action.user.fainted == False):
+					self.move(player1action.user, self.active2, player1action.target)
+				# pokemon 2 is alive, use move second
+				if (player2action.user.fainted == False):
+					self.move(player2action.user, self.active1, player2action.target)
 			else:
-				debug.db(dbflag, "UNEXPECTED COMBINATION OF ACTIONS: " + str(player1action.action) + " and " + str(player2action.action))
+				# pokemon 2 is alive, use move first
+				if (player2action.user.fainted == False):
+					self.move(player2action.user, self.active1, player2action.target)
+				# pokemon 1 is alive, use move second
+				if (player1action.user.fainted == False):
+					self.move(player1action.user, self.active2, player1action.target)
 
-			if (self.active1.status.onResidualOrder <= self.active2.status.onResidualOrder):
-				self.active1.status.onResidual(self.active1)
-				self.active2.status.onResidual(self.active2)
-			else:
-				self.active2.status.onResidual(self.active2)
-				self.active1.status.onResidual(self.active1)
+			if (self.get_winner() != None):
+				return
+
+			player1switchin = None
+			player2switchin = None
+			if (player1action.user.fainted == True):
+				player1switchin = self.player1.get_fainted_switch(self)
+			if (player2action.user.fainted == True):
+				player2switchin = self.player2.get_fainted_switch(self)
+			if (player1switchin != None):
+				self.switch(player1action.user, player1switchin)
+			if (player2switchin != None):
+				self.switch(player2action.user, player2switchin)
+
+		else:
+			debug.db(dbflag, "UNEXPECTED COMBINATION OF ACTIONS: " + str(player1action.action) + " and " + str(
+				player2action.action))
+
+		if (self.active1.status.onResidualOrder <= self.active2.status.onResidualOrder):
+			self.active1.status.onResidual(self.active1)
+			self.active2.status.onResidual(self.active2)
+		else:
+			self.active2.status.onResidual(self.active2)
+			self.active1.status.onResidual(self.active1)
+
 		return self.get_winner()

@@ -46,12 +46,6 @@ class Modifier:
 		self.target = target
 		self.amount = amount # number of levels stat increases/decreases, or if it's a status move, number of turns to be afflicted (e.g. rest=>3)
 
-def BLIZZARDonMoveAccuracy():
-	return 1
-
-def RAINDANCEonStart(target):
-	pass
-
 def RESTonHit(target):
 	if (target.hp >= target.max_hp or not target.set_status(status.SLP, True)):
 		log.message("But the move failed")
@@ -59,14 +53,6 @@ def RESTonHit(target):
 		return False
 	target.heal(target.max_hp)
 	target.status_counter = 3
-
-def SNOREonTryHit(source):
-	if (source.status != status.SLP):
-		log.message("But the move failed")
-		# return (False, " is not asleep")
-		return False
-	# return (True,)
-	return True
 
 def SOLARBEAMonTry(attacker, defender, move):
 	if (attacker.remove_volatile(status.TWOTURNMOVE)):
@@ -76,17 +62,6 @@ def SOLARBEAMonTry(attacker, defender, move):
 	log.message(attacker.template.species + " is gathering light")
 	# return (False, " is gathering sunlight")
 	return False
-def SOLARBEAMonBasePower(base_power, pokemon, target):
-	pass
-
-def SUNNYDAYonStart(target):
-	pass
-
-def SYNTHESISonHit(pokemon):
-	pass
-
-def THUNDERonMoveAccuracy():
-	pass
 
 ### TODO: add all special cases into this function. theres alot
 def get_all_moves_from_json():
