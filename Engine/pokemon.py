@@ -164,26 +164,26 @@ class Pokemon:
 			if (self.spa_stage == 6):
 				return False
 			else:
-				log.message(self.template.species + "'s special attack rose")
+				log.message(self.template.species + "'s special rose")
 				self.spa_stage = min(self.spa_stage + amount, 6)
 		else:
 			if (self.spa_stage == -6):
 				return False
 			else:
-				log.message(self.template.species + "'s special attack fell")
+				log.message(self.template.species + "'s special fell")
 				self.spa_stage = max(self.spa_stage + amount, -6)
 	def increment_spd(self, amount):
 		if (amount > 0):
 			if (self.spd_stage == 6):
 				return False
 			else:
-				log.message(self.template.species + "'s special defence rose")
+				log.message(self.template.species + "'s special rose")
 				self.spd_stage = min(self.spd_stage + amount, 6)
 		else:
 			if (self.spd_stage == -6):
 				return False
 			else:
-				log.message(self.template.species + "'s special defence fell")
+				log.message(self.template.species + "'s special fell")
 				self.spd_stage = max(self.spd_stage + amount, -6)
 	def increment_spe(self, amount):
 		if (amount > 0):

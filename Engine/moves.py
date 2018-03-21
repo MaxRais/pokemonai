@@ -45,6 +45,8 @@ class Modifier:
 		self.stat = stat # stat identifier string, or if it's a status move, status identifier string
 		self.target = target
 		self.amount = amount # number of levels stat increases/decreases, or if it's a status move, number of turns to be afflicted (e.g. rest=>3)
+	def to_string(self):
+		return str(self.chance) + '% ' + ' to change ' + self.stat + ' of ' + self.target + ' ' + str(self.amount) + ' stages'
 
 def RESTonHit(target):
 	if (target.hp >= target.max_hp or not target.set_status(status.SLP, True)):
@@ -84,9 +86,44 @@ def get_all_moves_from_json():
 			category = 'STATUS'
 		name = move_name
 		pp = attack['pp']
-		priority = 0 #obv not always true
+		priority = 0
 		element = attack['type'].upper()
-		target = FOE # need to see how we can automate this one
+		target = FOE
+		boosts = []
+		secondary = []
+
+		if name_no_dash == 'QUICKATTACK':
+			priority = 1
+
+		### Get special cases out of description
+		description = attack['description'].lower()
+		if category == 'STATUS':
+			if 'boosts' in description or 'boost' in description:
+				boosts = get_boosts(description, True)
+				target = SELF
+			elif 'lowers' in description or 'lower' in description:
+				boosts = get_boosts(description, False)
+				target = FOE
+			else:
+				# Still missing some weird status moves like disable and transform and mirror move
+				# Theres a lot of extra ones up here, basically any stauts move that doesn't change a stat
+				# Or inflict a status
+				status = get_status_effect(description)
+				if status == 'PSN' and name_no_dash == 'TOXIC':
+					status = 'TOX'
+				secondary = [Modifier(100, status, FOE)]
+		else:
+			if 'lowers' in description or 'lower' in description:
+				boosts = get_boosts(description, False)
+			elif get_status_effect(description) != 'NONE':
+				# Thrash and Dream Eater need to be manually done, accidentally affected here
+				status = get_status_effect(description)
+				percent = get_percent_chance(description)
+				secondary = [Modifier(percent, status, FOE)]
+
+		### Still need two-turn moves, multihit moves, and one-off special cases
+		# High crit moves
+
 		result[key] = BattleMoveTemplate(
 			num=num,
 			accuracy=accuracy,
@@ -96,8 +133,76 @@ def get_all_moves_from_json():
 			pp=pp,
 			priority=priority,
 			element=element,
-			target=target
+			target=target,
+			boosts=boosts,
+			secondary=secondary
 		)
 	return result
+
+def get_boosts(description, boost):
+	words = description.split()
+	modifier = 1 if boost else -1
+	stages = 0
+	if 'stage.' in words:
+		stage_key = words[words.index('stage.') - 1]
+		if stage_key == 'one':
+			stages = 1
+		elif stage_key == 'two':
+			stages = 2
+	elif 'stages.' in words:
+		stage_key = words[words.index('stages.') - 1]
+		if stage_key == 'one':
+			stages = 1
+		elif stage_key == 'two':
+			stages = 2
+	stat = get_targeted_stat(description)
+	stages *= modifier
+	target = SELF if boost else FOE
+
+	percent = get_percent_chance(description)
+
+	if stat == 'SPC':
+		boosts = [Modifier(percent, 'SPA', target, stages), Modifier(percent, 'SPD', target, stages)]
+	else:
+		boosts = [Modifier(percent, stat, target, stages)]
+	return boosts
+
+def get_percent_chance(description):
+	words = description.split()
+	percent = 100
+	if 'chance' in words:
+		percent_chance = words[words.index('chance') - 1]
+		percent = int(percent_chance[:2])
+	return percent
+
+def get_targeted_stat(description):
+	if 'attack' in description:
+		return 'ATK'
+	elif 'defense' in description:
+		return 'DEF'
+	elif 'special' in description:
+		return 'SPC'
+	elif 'speed' in description:
+		return 'SPE'
+	elif 'accuracy' in description:
+		return 'ACC'
+	elif 'evasion' in description:
+		return 'EVA'
+
+def get_status_effect(description):
+	if 'confuse' in description:
+		return 'CONFUSION'
+	elif 'poison' in description:
+		return 'PSN'
+	elif 'paralyze' in description:
+		return 'PAR'
+	elif 'burn' in description:
+		return 'BRN'
+	elif 'sleep' in description:
+		return 'SLP'
+	elif 'freeze' in description:
+		return 'FRZ'
+	else:
+		return 'NONE'
 
 battle_move = get_all_moves_from_json()
