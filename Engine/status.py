@@ -35,6 +35,7 @@ class BattleStatus:
 		self.onHit = kwargs.get("onHit", NOP)
 		self.onSwitchIn = kwargs.get("onSwitchIn", NOP)
 
+# Status effect methods TODO: (some bugs/incomplete code here might need to come back to later)
 def BRNonStart(target):#, source, sourceEffect):
 	# if (sourceEffect and source == "FLAME ORB" and target.set_status(BRN)):
 	if (target.set_status(BRN)):

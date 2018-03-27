@@ -1,9 +1,11 @@
 import pokemon
 
+# A team of pokemon
 class Team:
 	def __init__(self, pokemon):
 		self.pokemon = pokemon
 
+# Get 6 pokemon from text file
 def get_team_from_file(teamfile):
 	f = open(teamfile, 'r')
 	lines = f.readlines()

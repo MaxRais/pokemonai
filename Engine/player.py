@@ -6,12 +6,14 @@ import fakerandom
 SWITCH = "SWITCH"
 ATTACK = "ATTACK"
 
+# An action in the game
 class Action:
 	def __init__(self, action, user, target = None):
 		self.action = action
 		self.user = user
 		self.target = target
 
+# Base Player class
 class Player:
 	def __init__(self, ID):
 		self.ID = ID
@@ -26,6 +28,7 @@ class Player:
 	def get_fainted_switch(self, battle):
 		pass
 
+# Random AI
 class RandomAI(Player):
 	def __init__(self, ID):
 		self.ID = ID
@@ -84,6 +87,7 @@ class RandomAI(Player):
 					possible_choices.append(pokemon)
 			return fakerandom.fakechoice(possible_choices)
 
+# Human player
 class HumanPlayer(Player):
 	def __init__(self, ID):
 		self.ID = ID

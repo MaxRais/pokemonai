@@ -1,3 +1,4 @@
+# Gen 1 type chart
 BattleTypeChart = {
 "NORMAL" :
 {"NORMAL" : 1,

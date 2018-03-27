@@ -11,6 +11,7 @@ def main(team1file, team2file, team1player, team2player):
 	result = singlebattle.battle()
 	print ("Winner: " + str(result))
 
+# Inits game with desired players/AI players
 if (__name__ == "__main__"):
 	main("./Engine/tests/testteam.txt",
 		 "./Engine/tests/testteam.txt",

@@ -1,5 +1,6 @@
 import random
 
+# Seeded randomness class
 random.seed(1)
 
 def fakerandom():

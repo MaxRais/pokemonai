@@ -16,9 +16,11 @@ SPE = "SPE"
 ACC = "ACC"
 EVA = "EVA"
 
+# Hidden power type (not used)
 def get_hp_element(ivs):
 	return "NORMAL"
 
+# Represents a pokemon
 class Pokemon:
 	def __init__(self, species, level, ivs, evs, techniques, gender): # had to rename init variable "moves" to "techniques" to solve a naming conflict
 		self.template = pokedex.pokedex_list[species]
@@ -233,6 +235,7 @@ class Pokemon:
 	def get_decision_vars(self):
 		return ai.PokemonDecisionVars(self.fainted, self.template, self.max_hp, self.hp, self.status, self.volatiles, self.atk_stage, self.def_stage, self.spa_stage, self.spd_stage, self.spe_stage, self.acc_stage, self.eva_stage, self.crit_stage, self.moves)
 
+# Returns one pokemon from a text file representation
 def get_pokemon_from_list(pokemonlist):
 	species = ""
 	level = 0

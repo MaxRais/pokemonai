@@ -1,3 +1,4 @@
+# Important info about the pokemon we might want for ai decision making and evaluation
 class PokemonDecisionVars:
 	def __init__(self, fainted, template, max_hp, hp, status, volatiles, atk_stage, def_stage, spa_stage, spd_stage, spe_stage, acc_stage, eva_stage, crit_stage, moves):
 		self.fainted = fainted
