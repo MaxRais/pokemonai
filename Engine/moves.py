@@ -62,28 +62,38 @@ def RESTonHit(target):
 
 def DIGonTry(attacker, defender, move):
 	msg = attacker.template.species + " burrowed its way underground"
-	return AddVolatileForMove(attacker, defender, move, "DIG", msg)
+	return AddVolatileForMove(attacker, defender, move, True, "DIG", msg)
 
 def FLYonTry(attacker, defender, move):
 	msg = attacker.template.species + " flew up high"
-	return AddVolatileForMove(attacker, defender, move, "FLY", msg)
+	return AddVolatileForMove(attacker, defender, move, True, "FLY", msg)
 
 def SKYATTACKonTry(attacker, defender, move):
 	msg = attacker.template.species + " became cloaked in a harsh light"
-	return AddVolatileForMove(attacker, defender, move, "SKYATTACK", msg)
+	return AddVolatileForMove(attacker, defender, move, False, "SKYATTACK", msg)
 
 def SOLARBEAMonTry(attacker, defender, move):
 	msg = attacker.template.species + " is gathering light"
-	return AddVolatileForMove(attacker, defender, move, "SOLARBEAM", msg)
+	return AddVolatileForMove(attacker, defender, move, False, "SOLARBEAM", msg)
 
-def AddVolatileForMove(attacker, defender, move, move_name, log_message):
-	if (attacker.remove_volatile(status.TWOTURNMOVE)):
-		# return (True,)
-		return True
-	attacker.add_volatile(status.TWOTURNMOVE, move_name)
-	log.message(log_message)
-	# return (False, " is gathering sunlight")
-	return False
+def AddVolatileForMove(attacker, defender, move, invulnerable, move_name, log_message):
+	if invulnerable:
+		if (attacker.remove_volatile(status.INVULNERABLE)) and (attacker.remove_volatile(status.TWOTURNMOVE)):
+			# return (True,)
+			return True
+		attacker.add_volatile(status.TWOTURNMOVE, move_name)
+		attacker.add_volatile(status.INVULNERABLE, move_name)
+		log.message(log_message)
+		# return (False, " is gathering sunlight")
+		return False
+	else:
+		if (attacker.remove_volatile(status.TWOTURNMOVE)):
+			# return (True,)
+			return True
+		attacker.add_volatile(status.TWOTURNMOVE, move_name)
+		log.message(log_message)
+		# return (False, " is gathering sunlight")
+		return False
 
 
 ### TODO: add all special cases into this function. theres alot
@@ -113,6 +123,7 @@ def get_all_moves_from_json():
 		boosts = []
 		secondary = []
 		num_hits = 1
+		onTry = NOP
 
 		if key == 'QUICKATTACK':
 			priority = 1
@@ -170,7 +181,8 @@ def get_all_moves_from_json():
 			target=target,
 			boosts=boosts,
 			secondary=secondary,
-			num_hits=num_hits
+			num_hits=num_hits,
+			onTry=onTry
 		)
 	return result
 

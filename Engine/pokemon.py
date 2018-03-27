@@ -84,6 +84,7 @@ class Pokemon:
 		self.status_counter = 0
 		self.volatiles = []
 		self.twoturnmove_source = None
+		self.invulnerable_source = None
 		partiallytrapped_count = 0
 		partiallytrapped_source = None
 		reflect_countdown = 0
@@ -96,6 +97,8 @@ class Pokemon:
 			retval = True
 		if (volatile.name == status.TWOTURNMOVE):
 			self.twoturnmove_source = source
+		if (volatile.name == status.INVULNERABLE):
+			self.invulnerable_source = source
 		return retval
 	def remove_volatile(self, old_volatile):
 		retval = False
@@ -105,6 +108,8 @@ class Pokemon:
 			retval = True
 		if (volatile.name == status.TWOTURNMOVE):
 			self.twoturnmove_source = None
+		if (volatile.name == status.INVULNERABLE):
+			self.invulnerable_source = None
 		return retval
 	def damage(self, amount):
 		self.hp = max(self.hp - amount, 0)

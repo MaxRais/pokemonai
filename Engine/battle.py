@@ -204,6 +204,11 @@ class Battle:
 			debug.db(dbflag, "Move failed onTryHit")
 			return
 
+		# if the target is invulnerable, we don't hit
+		if target.invulnerable_source is not None:
+			log.message("But it missed")
+			return
+
 		# Check is move has any special accuracy characteristics
 		accuracy = move.onMoveAccuracy()
 		damage = 0
@@ -337,21 +342,23 @@ class Battle:
 
 		# While the game is not over
 		while (self.get_winner() == None):
-			player1action = None
-			player2action = None
-			# Get action from each player
-			while (True):
-				player1action = self.player1.get_action(self)
-				if (player1action.action == player.SWITCH and "PARTIALLYTRAPPED" in self.active1.volatiles and status.battle_status["PARTIALLYTRAPPED"].onTrySwitchAction() == False):
-					continue
-				else:
-					break
-			while (True):
-				player2action = self.player2.get_action(self)
-				if (player2action.action == player.SWITCH and "PARTIALLYTRAPPED" in self.active2.volatiles and status.battle_status["PARTIALLYTRAPPED"].onTrySwitchAction() == False):
-					continue
-				else:
-					break
+			if self.active1.twoturnmove_source is None:
+				player1action = None
+				while (True):
+					player1action = self.player1.get_action(self)
+					if (player1action.action == player.SWITCH and "PARTIALLYTRAPPED" in self.active1.volatiles and status.battle_status["PARTIALLYTRAPPED"].onTrySwitchAction() == False):
+						continue
+					else:
+						break
+
+			if self.active2.twoturnmove_source is None:
+				player2action = None
+				while (True):
+					player2action = self.player2.get_action(self)
+					if (player2action.action == player.SWITCH and "PARTIALLYTRAPPED" in self.active2.volatiles and status.battle_status["PARTIALLYTRAPPED"].onTrySwitchAction() == False):
+						continue
+					else:
+						break
 
 			# Play out the turn
 			self.play_turn(player1action, player2action)

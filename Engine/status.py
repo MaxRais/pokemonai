@@ -15,6 +15,7 @@ FLINCH = "FLINCH"
 PARTIALLYTRAPPED = "PARTIALLYTRAPPED"
 REFLECT = "REFLECT"
 TWOTURNMOVE = "TWOTURNMOVE"
+INVULNERABLE = "INVULNERABLE"
 
 def NOP(arg1 = None, arg2 = None, arg3 = None):
 	return None
@@ -210,6 +211,13 @@ def TWOTURNMOVEonStart(target, source):
 def TWOTURNMOVEonEnd(target):
 	print "TWOTURNMOVE START TEST"
 	target.removeVolatile(status.TWOTURNMOVE)
+
+def INVULNERABLEonStart(target, source):
+	print "INVULNERABLE START TEST"
+	target.add_volatile(status.INVULNERABLE, source)
+def INVULNERABLEonEnd(target):
+	print "INVULNERABLE END TEST"
+	target.removeVolatile(status.INVULNERABLE)
 # not sure if we need these next two
 # def TWOTURNMOVEonLockMove():
 # 	return this.effectData.move
@@ -554,6 +562,7 @@ battle_status = {
 	"PARTIALLYTRAPPED" : BattleStatus("PARTIALLYTRAPPED", "VOLATILE", onStart = PARTIALLYTRAPPEDonStart, onResidualOrder = 11, onResidual = PARTIALLYTRAPPEDonResidual, onTrySwitchAction = PARTIALLYTRAPPEDonTrySwitchAction),#, onEnd = PARTIALLYTRAPPEDonEnd),
 	# "LOCKEDMOVE" : BattleStatus("LOCKEDMOVE", "VOLATILE", onResidual = LOCKEDMOVEonResidual, onStart = LOCKEDMOVEonRestart, onRestart = LOCKEDMOVEonRestart, onEnd = LOCKEDMOVEonEnd, onLockMove = LOCKEDMOVEonLockMove),
 	"TWOTURNMOVE" : BattleStatus("TWOTURNMOVE", "VOLATILE", onStart = TWOTURNMOVEonStart, onEnd = TWOTURNMOVEonEnd),#, onLockMove = TWOTURNMOVEonLockMove, onLockMoveTarget = TWOTURNMOVEonLockMoveTarget),
+	"INVULNERABLE" : BattleStatus("INVULNERABLE", "VOLATILE", onStart = INVULNERABLEonStart, onEnd = INVULNERABLEonEnd),
 	# "CHOICELOCK" : BattleStatus("CHOICELOCK", "VOLATILE", onStart = CHOICELOCKonStart, onDisableMove = CHOICELOCKonDisableMove),
 	# "MUSTRECHARGE" : BattleStatus("MUSTRECHARGE", "VOLATILE", onBeforeMovePriority = 11, onBeforeMove = MUSTRECHARGEonBeforeMove, onLockMove = MUSTRECHARGEonLockMove),
 	# "FUTUREMOVE" : BattleStatus("FUTUREMOVE", "VOLATILE", onStart = FUTUREMOVEonStart, onResidualOrder = 3, onResidual = FUTUREMOVEonResidual),
