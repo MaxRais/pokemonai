@@ -191,17 +191,33 @@ class Battle:
 		damage = 0
 		if (accuracy == None):
 			accuracy = 1
+
 		accuracy = accuracy * move.accuracy * self.get_accuracy_modifier(user.acc_stage) / self.get_accuracy_modifier(target.eva_stage)
-		if (accuracy < 0):
-			damage = self.get_damage(user, target, move)
-			target.damage(damage)
-		elif (fakerandom.fakerandom() * 100 < accuracy):
-			damage = self.get_damage(user, target, move)
-			target.damage(damage)
+		if move.num_hits == 1:
+			if (accuracy < 0):
+				damage = self.get_damage(user, target, move)
+				target.damage(damage)
+			elif (fakerandom.fakerandom() * 100 < accuracy):
+				damage = self.get_damage(user, target, move)
+				target.damage(damage)
+			else:
+				log.message("But it missed")
+				debug.db(dbflag, "Move missed/failed")
+				return
 		else:
-			log.message("But it missed")
-			debug.db(dbflag, "Move missed/failed")
-			return
+			hit_count = 0
+			for i in range(0, move.num_hits):
+				damage = 0
+				if (accuracy < 0):
+					damage = self.get_damage(user, target, move)
+					target.damage(damage)
+					hit_count += 1
+				elif (fakerandom.fakerandom() * 100 < accuracy):
+					damage = self.get_damage(user, target, move)
+					target.damage(damage)
+					hit_count += 1
+
+			log.message("It hit " + str(hit_count) + " times!")
 
 		move.onStart(target)
 

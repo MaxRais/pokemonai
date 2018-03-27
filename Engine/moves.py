@@ -1,6 +1,7 @@
 import attacks
 import status
 import log
+import fakerandom
 
 SELF = "SELF"
 FOE = "FOE"
@@ -38,6 +39,7 @@ class BattleMoveTemplate:
 		self.secondary = kwargs.get("secondary", [])
 		self.target = kwargs.get("target", "UNDEFINED")
 		self.element = kwargs.get("element", "TYPELESS")
+		self.num_hits = kwargs.get("num_hits", 0)
 
 class Modifier:
 	def __init__(self, chance, stat, target, amount = 0):
@@ -56,14 +58,31 @@ def RESTonHit(target):
 	target.heal(target.max_hp)
 	target.status_counter = 3
 
+def DIGonTry(attacker, defender, move):
+	msg = attacker.template.species + " burrowed its way underground"
+	return AddVolatileForMove(attacker, defender, move, "DIG", msg)
+
+def FLYonTry(attacker, defender, move):
+	msg = attacker.template.species + " flew up high"
+	return AddVolatileForMove(attacker, defender, move, "FLY", msg)
+
+def SKYATTACKonTry(attacker, defender, move):
+	msg = attacker.template.species + " became cloaked in a harsh light"
+	return AddVolatileForMove(attacker, defender, move, "SKYATTACK", msg)
+
 def SOLARBEAMonTry(attacker, defender, move):
+	msg = attacker.template.species + " is gathering light"
+	return AddVolatileForMove(attacker, defender, move, "SOLARBEAM", msg)
+
+def AddVolatileForMove(attacker, defender, move, move_name, log_message):
 	if (attacker.remove_volatile(status.TWOTURNMOVE)):
 		# return (True,)
 		return True
-	attacker.add_volatile(status.TWOTURNMOVE, "SOLARBEAM")
-	log.message(attacker.template.species + " is gathering light")
+	attacker.add_volatile(status.TWOTURNMOVE, move_name)
+	log.message(log_message)
 	# return (False, " is gathering sunlight")
 	return False
+
 
 ### TODO: add all special cases into this function. theres alot
 def get_all_moves_from_json():
@@ -91,8 +110,9 @@ def get_all_moves_from_json():
 		target = FOE
 		boosts = []
 		secondary = []
+		num_hits = 1
 
-		if name_no_dash == 'QUICKATTACK':
+		if key == 'QUICKATTACK':
 			priority = 1
 
 		### Get special cases out of description
@@ -120,8 +140,21 @@ def get_all_moves_from_json():
 				status = get_status_effect(description)
 				percent = get_percent_chance(description)
 				secondary = [Modifier(percent, status, FOE)]
+			elif 'hits' in description:
+				num_hits = get_num_hits(description)
+				if num_hits == 1:
+					if key == 'DIG':
+						onTry = DIGonTry
+					elif key == 'FLY':
+						onTry = FLYonTry
+					elif key == 'SKYATTACK':
+						onTry = SKYATTACKonTry
 
-		### Still need two-turn moves, multihit moves, and one-off special cases
+
+		### Still need:
+		# two-turn moves,
+		# multihit moves,
+		# one-off special cases
 		# High crit moves
 
 		result[key] = BattleMoveTemplate(
@@ -135,7 +168,8 @@ def get_all_moves_from_json():
 			element=element,
 			target=target,
 			boosts=boosts,
-			secondary=secondary
+			secondary=secondary,
+			num_hits=num_hits
 		)
 	return result
 
@@ -204,5 +238,13 @@ def get_status_effect(description):
 		return 'FRZ'
 	else:
 		return 'NONE'
+
+def get_num_hits(description):
+	if 'twice' in description:
+		return 2
+	if 'two' in description and 'five' in description:
+		return fakerandom.fakerandint(2, 5)
+	else:
+		return 1
 
 battle_move = get_all_moves_from_json()
