@@ -13,6 +13,7 @@ class Template:
 		self.base_spd = base_stats[4]
 		self.base_spe = base_stats[5]
 
+# All Gen1 pokemon, types, base stats, etc
 pokedex_list = {
 "BULBASAUR" : Template(1,"Bulbasaur",["GRASS","POISON"],[0.875,0.125,0],[45,49,49,65,65,45]),
 "IVYSAUR" : Template(2,"Ivysaur",["GRASS","POISON"],[0.875,0.125,0],[60,62,63,80,80,60]),

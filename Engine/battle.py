@@ -22,6 +22,8 @@ class Battle:
 		self.active2 = None
 		self.turncount = 0
 		self.turnlimit = turnlimit
+
+	# Determines the winner ID of the battle, returns None if no one wins
 	def get_winner(self):
 		team1fainted = True
 		team2fainted = True
@@ -39,6 +41,8 @@ class Battle:
 			return "TURN LIMIT EXCEEDED ON TURN " + str(self.turncount)
 		else:
 			return None
+
+	# Switches between two pokemon
 	def switch(self, sw_out, sw_in):
 		if (sw_out == self.active1):
 			self.active1 = sw_in
@@ -55,6 +59,8 @@ class Battle:
 			self.player1.set_active(sw_in)
 		else:
 			self.player2.set_active(sw_in)
+
+	# Returns stat multiplier given a stage
 	def get_stat_modifier(self, stage):
 		if (stage == -6):
 			return 2/8.0
@@ -82,6 +88,8 @@ class Battle:
 			return 7/2.0
 		elif (stage == 6):
 			return 8/2.0
+
+	# Returns crit chance given a stage
 	def get_crit_modifier(self, stage):
 		if (stage == 0):
 			return 1.0/16
@@ -93,6 +101,8 @@ class Battle:
 			return 1.0/3
 		elif (stage >= 4):
 			return 1.0/2
+
+	# Calculates battle damage (randomness for crit, miss, and exact damage)
 	def get_damage(self, attacker, defender, move):
 		if (move.category == moves.STATUS):
 			return 0
@@ -122,6 +132,8 @@ class Battle:
 			log.message("It's a critical hit")
 		randomamount = (1 - (fakerandom.fakerandom() * 0.15))
 		return int((((2 * (attacker.level + 10)) / 250.0) * (float(attack) / float(defence)) * move.base_power + 2) * stab * type_effectiveness * critical * randomamount)
+
+	# Gets accuracy multiplier given a stage
 	def get_accuracy_modifier(self, stage):
 		if (stage == -6):
 			return 3/9.0
@@ -149,6 +161,8 @@ class Battle:
 			return 8/3.0
 		elif (stage == 6):
 			return 9/3.0
+
+	# Executes a move
 	def move(self, user, opponent, move):
 		statuslist = []
 		# try:
@@ -166,6 +180,7 @@ class Battle:
 		for st in statuslist:
 			onBeforeMove = st.onBeforeMove(user, target, move)
 			# if (onBeforeMove != None and onBeforeMove[0] == False):
+			# Call onBeforeMove flag function first if it exists
 			if (onBeforeMove != None and onBeforeMove == False):
 				# log.message(user.template.species + " couldn't use " + move.name + " due to " + str(onBeforeMove[1]))
 				debug.db(dbflag, "Move failed onBeforeMove")
@@ -174,6 +189,7 @@ class Battle:
 		log.message(user.template.species + " used " + move.name)
 		move.pp -= 1
 
+		# Call move onTry function if it exists
 		onTry = move.onTry(user, target, move)
 		# if (onTry != None and onTry[0] == False):
 		if (onTry != None and onTry == False):
@@ -181,18 +197,21 @@ class Battle:
 			debug.db(dbflag, "Move failed onTry")
 			return
 
+		# Call move onTryHit function if it exists
 		onTryHit = move.onTryHit(user)
 		if (onTryHit != None and onTryHit == False):
 			# log.message(move.name + " failed because " + user.template.species + onTryHit[1])
 			debug.db(dbflag, "Move failed onTryHit")
 			return
 
+		# Check is move has any special accuracy characteristics
 		accuracy = move.onMoveAccuracy()
 		damage = 0
 		if (accuracy == None):
 			accuracy = 1
 
 		accuracy = accuracy * move.accuracy * self.get_accuracy_modifier(user.acc_stage) / self.get_accuracy_modifier(target.eva_stage)
+		# Multihit move calculation
 		if move.num_hits == 1:
 			if (accuracy < 0):
 				damage = self.get_damage(user, target, move)
@@ -219,13 +238,17 @@ class Battle:
 
 			log.message("It hit " + str(hit_count) + " times!")
 
+		# Call move on start method if it exists
 		move.onStart(target)
 
+		# Call move onHit method if it exists
 		move.onHit(target)
 
+		# Drain health from user if applicable
 		if (move.drain != 0):
 			user.heal(int(move.drain * damage))
 
+		# Apply status boosts
 		for boost in move.boosts:
 			if (fakerandom.fakerandom() * 100 <= boost.chance):
 				boost_target = None
@@ -284,12 +307,15 @@ class Battle:
 							log.message(target.template.species + "'s evasiveness can't go any lower")
 
 
+		# Check for death of pokemon
 		if (target.fainted == True):
 			log.message(target.template.species + " fainted")
 			return
 
+		# Apply status
 		user.status.onHit(target, user, move)
 
+		# Apply secondary status effects
 		for second in move.secondary:
 			if (fakerandom.fakerandom() * 100 <= second.chance):
 				second_target = None
@@ -299,6 +325,7 @@ class Battle:
 					second_target = target
 				status.battle_status[second.stat].onStart(second_target)
 
+	# Play out the battle
 	def battle(self):
 		self.team1.pokemon[0].is_active = True
 		self.team2.pokemon[0].is_active = True
@@ -308,9 +335,11 @@ class Battle:
 		self.player2.set_active(self.active2)
 		self.turncount += 1
 
+		# While the game is not over
 		while (self.get_winner() == None):
 			player1action = None
 			player2action = None
+			# Get action from each player
 			while (True):
 				player1action = self.player1.get_action(self)
 				if (player1action.action == player.SWITCH and "PARTIALLYTRAPPED" in self.active1.volatiles and status.battle_status["PARTIALLYTRAPPED"].onTrySwitchAction() == False):
@@ -324,6 +353,7 @@ class Battle:
 				else:
 					break
 
+			# Play out the turn
 			self.play_turn(player1action, player2action)
 			if (self.get_winner() != None):
 				return self.get_winner()

@@ -1,3 +1,5 @@
+### hardcoded moves from the old engine code that we can use as a reference
+
 battle_moves = {
 	"AMNESIA" : BattleMoveTemplate(
 		num = 133,

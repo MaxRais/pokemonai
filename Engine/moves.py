@@ -41,6 +41,7 @@ class BattleMoveTemplate:
 		self.element = kwargs.get("element", "TYPELESS")
 		self.num_hits = kwargs.get("num_hits", 0)
 
+# A stat/status modifier effect on a move
 class Modifier:
 	def __init__(self, chance, stat, target, amount = 0):
 		self.chance = chance
@@ -50,6 +51,7 @@ class Modifier:
 	def to_string(self):
 		return str(self.chance) + '% ' + ' to change ' + self.stat + ' of ' + self.target + ' ' + str(self.amount) + ' stages'
 
+### Special case methods below
 def RESTonHit(target):
 	if (target.hp >= target.max_hp or not target.set_status(status.SLP, True)):
 		log.message("But the move failed")
@@ -126,7 +128,7 @@ def get_all_moves_from_json():
 				target = FOE
 			else:
 				# Still missing some weird status moves like disable and transform and mirror move
-				# Theres a lot of extra ones up here, basically any stauts move that doesn't change a stat
+				# Theres a lot of extra ones up here, basically any status move that doesn't change a stat
 				# Or inflict a status
 				status = get_status_effect(description)
 				if status == 'PSN' and name_no_dash == 'TOXIC':
@@ -153,7 +155,6 @@ def get_all_moves_from_json():
 
 		### Still need:
 		# two-turn moves,
-		# multihit moves,
 		# one-off special cases
 		# High crit moves
 

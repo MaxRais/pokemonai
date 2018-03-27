@@ -7,7 +7,7 @@ python Engine/main.py
 
 
 ***Credits***
-Kevin Gold - CS4150 Instructor
+Kevin Gold Zhengxing Chen, Chandan Shankarappa - CS4150 Instructor
 pafisher - Provided Pokemon simulator python engine which we modified and adapted to
 include only Generation 1 mechanics (https://github.com/pafisher/Pokemon-AI-Project)
 Kush Khosla, et. al - The inspiration and reference paper for this project (https://web.stanford.edu/class/cs221/2017/restricted/p-final/kkhosla/final.pdf)
