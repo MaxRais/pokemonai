@@ -22,6 +22,7 @@ class BattleMoveTemplate:
 		self.category = kwargs.get("category", "UNDEFINED")
 		self.is_viable = kwargs.get("is_viable", True)
 		self.name = kwargs.get("name", "UNDEFINED")
+		self.key = kwargs.get("key", "UNDEFINED")
 		self.pp = kwargs.get("pp", 0)
 		self.priority = kwargs.get("priority", 0)
 		self.flags = kwargs.get("flags", [])
@@ -72,9 +73,9 @@ def SKYATTACKonTry(attacker, defender, move):
 	msg = attacker.template.species + " became cloaked in a harsh light"
 	return AddVolatileForMove(attacker, defender, move, False, "SKYATTACK", msg)
 
-def SOLARBEAMonTry(attacker, defender, move):
-	msg = attacker.template.species + " is gathering light"
-	return AddVolatileForMove(attacker, defender, move, False, "SOLARBEAM", msg)
+def TWOTURNMOVEonTry(attacker, defender, move):
+	msg = str(move.name) + " is charging"
+	return AddVolatileForMove(attacker, defender, move, False, move.key, msg)
 
 def AddVolatileForMove(attacker, defender, move, invulnerable, move_name, log_message):
 	if invulnerable:
@@ -162,12 +163,15 @@ def get_all_moves_from_json():
 						onTry = FLYonTry
 					elif key == 'SKYATTACK':
 						onTry = SKYATTACKonTry
-
+			elif 'charges' in description:
+				if 'first' in description or 'one' in description or '1' in description:
+					onTry = TWOTURNMOVEonTry
+				# otherwise we're dealing with Bide, need to implement
+			elif 'high' in description and 'critical' in description:
+				critRatio = 2
 
 		### Still need:
-		# two-turn moves,
 		# one-off special cases
-		# High crit moves
 
 		result[key] = BattleMoveTemplate(
 			num=num,
