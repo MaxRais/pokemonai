@@ -2,6 +2,7 @@ import attacks
 import status
 import log
 import fakerandom
+import sys
 
 SELF = "SELF"
 FOE = "FOE"
@@ -77,6 +78,9 @@ def TWOTURNMOVEonTry(attacker, defender, move):
 	msg = str(move.name) + " is charging"
 	return AddVolatileForMove(attacker, defender, move, False, move.key, msg)
 
+def OHKOonHit(target):
+	log.message("It's a one-hit KO!")
+
 def AddVolatileForMove(attacker, defender, move, invulnerable, move_name, log_message):
 	if invulnerable:
 		if (attacker.remove_volatile(status.INVULNERABLE)) and (attacker.remove_volatile(status.TWOTURNMOVE)):
@@ -125,6 +129,7 @@ def get_all_moves_from_json():
 		secondary = []
 		num_hits = 1
 		onTry = NOP
+		onHit = NOP
 
 		if key == 'QUICKATTACK':
 			priority = 1
@@ -139,9 +144,6 @@ def get_all_moves_from_json():
 				boosts = get_boosts(description, False)
 				target = FOE
 			else:
-				# Still missing some weird status moves like disable and transform and mirror move
-				# Theres a lot of extra ones up here, basically any status move that doesn't change a stat
-				# Or inflict a status
 				status = get_status_effect(description)
 				if status == 'PSN' and name_no_dash == 'TOXIC':
 					status = 'TOX'
@@ -169,10 +171,40 @@ def get_all_moves_from_json():
 				# otherwise we're dealing with Bide, need to implement
 			elif 'high' in description and 'critical' in description:
 				critRatio = 2
+			elif 'ohkoes' in description:
+				base_power = sys.maxint
+				onHit = OHKOonHit
 
 		### Still need:
 		# Bide
-
+		# Conversion
+		# counter
+		# disable
+		# double-edge
+		# dragon rage
+		# dream eater
+		# explosion
+		# focus energy
+		# Haze
+		# high jump Kick
+		# hyper beam
+		# jump Kick
+		# light Screen
+		# Mimic
+		# Minimize
+		# Mirror move
+		# mist (This one seems like a doozy)
+		# Psywave
+		# Rage
+		# Recover
+		# reflect
+		# Seismic Toss
+		# self-Destruct
+		# Soft-boiled
+		# sonic Boom
+		# Struggle
+		# Supersonic
+		# transform
 
 		result[key] = BattleMoveTemplate(
 			num=num,
@@ -187,7 +219,8 @@ def get_all_moves_from_json():
 			boosts=boosts,
 			secondary=secondary,
 			num_hits=num_hits,
-			onTry=onTry
+			onTry=onTry,
+			onHit=onHit
 		)
 	return result
 
