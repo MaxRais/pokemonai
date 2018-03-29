@@ -145,6 +145,16 @@ def CONFUSIONonBeforeMove(pokemon, target = None, move = None):
 	# return (False, CONFUSION)
 	return False
 
+def FLINCHonStart(target):
+	target.add_volatile(FLINCH)
+
+def FLINCHonBeforeMove(pokemon, target = None, move = None):
+	if (pokemon.remove_volatile(FLINCH)):
+		log.message(pokemon.template.species + " flinched!")
+		return False
+	return True
+
+
 # trapped: {
 # 		noCopy: true,
 # 		onTrySwitchAction: function (pokemon) {
@@ -557,6 +567,7 @@ battle_status = {
 	"PSN" : BattleStatus("PSN", "STATUS", onStart = PSNonStart, onResidualOrder = 9, onResidual = PSNonResidual),
 	"TOX" : BattleStatus("TOX", "STATUS", onStart = TOXonStart, onSwitchIn = TOXonSwitchIn, onResidualOrder = 9, onResidual = TOXonResidual),
 	"CONFUSION" : BattleStatus("CONFUSION", "VOLATILE", onStart = CONFUSIONonStart, onBeforeMovePriority = 3, onBeforeMove = CONFUSIONonBeforeMove),#, onEnd = CONFUSIONonEnd),
+	"FLINCH" : BattleStatus("FLINCH", "VOLATILE", onStart = FLINCHonStart, onBeforeMovePriority = 3, onBeforeMove = FLINCHonBeforeMove),
 	# "TRAPPED" : BattleStatus("TRAPPED", "VOLATILE", noCopy = True, onTrySwitchAction = TRAPPEDonTrySwitchAction, onStart = TRAPPEDonStart),
 	# "TRAPPER" : BattleStatus("TRAPPER", "VOLATILE", noCopy = True),
 	"PARTIALLYTRAPPED" : BattleStatus("PARTIALLYTRAPPED", "VOLATILE", onStart = PARTIALLYTRAPPEDonStart, onResidualOrder = 11, onResidual = PARTIALLYTRAPPEDonResidual, onTrySwitchAction = PARTIALLYTRAPPEDonTrySwitchAction),#, onEnd = PARTIALLYTRAPPEDonEnd),

@@ -362,6 +362,8 @@ class Battle:
 
 			# Play out the turn
 			self.play_turn(player1action, player2action)
+			self.active1.remove_volatile("FLINCH")
+			self.active2.remove_volatile("FLINCH")
 			if (self.get_winner() != None):
 				return self.get_winner()
 

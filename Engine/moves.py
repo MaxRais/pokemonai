@@ -171,7 +171,8 @@ def get_all_moves_from_json():
 				critRatio = 2
 
 		### Still need:
-		# one-off special cases
+		# Bide
+
 
 		result[key] = BattleMoveTemplate(
 			num=num,
@@ -253,6 +254,8 @@ def get_status_effect(description):
 		return 'SLP'
 	elif 'freeze' in description:
 		return 'FRZ'
+	elif 'flinch' in description:
+		return 'FLINCH'
 	else:
 		return 'NONE'
 
