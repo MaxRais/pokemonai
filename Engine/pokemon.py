@@ -85,6 +85,8 @@ class Pokemon:
 		self.volatiles = []
 		self.twoturnmove_source = None
 		self.invulnerable_source = None
+		self.fainted_self = False
+
 		partiallytrapped_count = 0
 		partiallytrapped_source = None
 		reflect_countdown = 0

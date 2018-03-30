@@ -81,6 +81,9 @@ def TWOTURNMOVEonTry(attacker, defender, move):
 def OHKOonHit(target):
 	log.message("It's a one-hit KO!")
 
+def FAINTSELFonTry(attacker, defender, move):
+	attacker.fainted_self = True
+
 def AddVolatileForMove(attacker, defender, move, invulnerable, move_name, log_message):
 	if invulnerable:
 		if (attacker.remove_volatile(status.INVULNERABLE)) and (attacker.remove_volatile(status.TWOTURNMOVE)):
@@ -174,6 +177,9 @@ def get_all_moves_from_json():
 			elif 'ohkoes' in description:
 				base_power = sys.maxint
 				onHit = OHKOonHit
+			elif 'faint' in description and 'user' in description:
+				onTry = FAINTSELFonTry
+
 
 		### Still need:
 		# Bide

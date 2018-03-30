@@ -111,6 +111,7 @@ class Battle:
 		if (move.category == moves.PHYSICAL):
 			attack = attacker.attack * self.get_stat_modifier(attacker.atk_stage)
 			defence = defender.defence * self.get_stat_modifier(defender.def_stage)
+			if attacker.fainted_self : defence = defence / 2
 		elif (move.category == moves.SPECIAL):
 			attack = attacker.spattack * self.get_stat_modifier(attacker.spa_stage)
 			defence = defender.spdefence * self.get_stat_modifier(defender.spd_stage)
@@ -227,6 +228,13 @@ class Battle:
 			else:
 				log.message("But it missed")
 				debug.db(dbflag, "Move missed/failed")
+				return
+			if user.fainted_self:
+				if (target.fainted == True):
+					log.message(target.template.species + " fainted")
+
+				user.damage(sys.maxint)
+				log.message(user.template.species + " fainted")
 				return
 		else:
 			hit_count = 0
