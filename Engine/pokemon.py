@@ -24,6 +24,7 @@ def get_hp_element(ivs):
 class Pokemon:
 	def __init__(self, species, level, ivs, evs, techniques, gender): # had to rename init variable "moves" to "techniques" to solve a naming conflict
 		self.template = pokedex.pokedex_list[species]
+		self.types = self.template.elements
 		self.level = level
 		self.max_hp = int((((ivs[0] + (2 * self.template.base_hp) + int(evs[0] / 4) + 100) * level) / 100) + 10)
 		self.hp = self.max_hp
@@ -234,13 +235,13 @@ class Pokemon:
 				log.message(self.template.species + "'s evasiveness fell")
 				self.eva_stage = max(self.eva_stage + amount, -6)
 	def get_stab(self, move_element):
-		for elem in self.template.elements:
+		for elem in self.types:
 			if (move_element == elem):
 				return 1.5
 		return 1
 
 	def get_decision_vars(self):
-		return ai.PokemonDecisionVars(self.fainted, self.template, self.max_hp, self.hp, self.status, self.volatiles, self.atk_stage, self.def_stage, self.spa_stage, self.spd_stage, self.spe_stage, self.acc_stage, self.eva_stage, self.crit_stage, self.moves)
+		return ai.PokemonDecisionVars(self.fainted, self.template, self.types, self.max_hp, self.hp, self.status, self.volatiles, self.atk_stage, self.def_stage, self.spa_stage, self.spd_stage, self.spe_stage, self.acc_stage, self.eva_stage, self.crit_stage, self.moves)
 
 # Returns one pokemon from a text file representation
 def get_pokemon_from_list(pokemonlist):

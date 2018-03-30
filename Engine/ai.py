@@ -1,8 +1,9 @@
 # Important info about the pokemon we might want for ai decision making and evaluation
 class PokemonDecisionVars:
-	def __init__(self, fainted, template, max_hp, hp, status, volatiles, atk_stage, def_stage, spa_stage, spd_stage, spe_stage, acc_stage, eva_stage, crit_stage, moves):
+	def __init__(self, fainted, template, types, max_hp, hp, status, volatiles, atk_stage, def_stage, spa_stage, spd_stage, spe_stage, acc_stage, eva_stage, crit_stage, moves):
 		self.fainted = fainted
 		self.template = template
+		self.types = types
 		self.max_hp = max_hp
 		self.hp = hp
 		self.status = status
@@ -21,7 +22,7 @@ class PokemonDecisionVars:
 		self.move4 = moves[3]
 	def print_full_decision_vars(self):
 		print "self.species: " + str(self.template.species)
-		print "self.elements: " + str(self.template.elements)
+		print "self.elements: " + str(self.types)
 		print "self.max_hp: " + str(self.max_hp)
 		print "self.hp: " + str(self.hp)
 		if (self.status.name != "NONE"):
@@ -47,7 +48,7 @@ class PokemonDecisionVars:
 		print "self.move1: " + str(self.move1.name) + " pp: " + str(self.move1.pp) + "\t\tself.move2: " + str(self.move2.name) + " pp: " + str(self.move2.pp) + "\t\tself.move3: " + str(self.move3.name) + " pp: " + str(self.move3.pp) + "\t\tself.move4: " + str(self.move4.name) + " pp: " + str(self.move4.pp)
 	def print_opponent_decision_vars(self):
 		print "self.species: " + str(self.template.species)
-		print "self.elements: " + str(self.template.elements)
+		print "self.elements: " + str(self.types)
 		print "self.max_hp: " + str(self.max_hp)
 		print "self.hp: " + str(self.hp)
 		if (self.status.name != "NONE"):
@@ -72,7 +73,7 @@ class PokemonDecisionVars:
 			print "self.crit_stage: " + str(self.crit_stage)
 	def print_team_decision_vars(self):
 		print "self.species: " + str(self.template.species)
-		print "self.elements: " + str(self.template.elements)
+		print "self.elements: " + str(self.types)
 		print "self.max_hp: " + str(self.max_hp)
 		print "self.hp: " + str(self.hp)
 		if (self.status.name != "NONE"):

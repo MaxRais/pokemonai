@@ -119,7 +119,7 @@ class Battle:
 			debug.db(dbflag, "UNEXPECTED MOVE CATEGORY " + str(move.category))
 			sys.exit()
 		stab = attacker.get_stab(move.element)
-		type_effectiveness = typechart.get_effectiveness(move.element, defender.template.elements)
+		type_effectiveness = typechart.get_effectiveness(move.element, defender.types)
 		if (type_effectiveness == 0):
 			log.message("It has no effect")
 			return 0

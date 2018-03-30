@@ -78,12 +78,6 @@ def TWOTURNMOVEonTry(attacker, defender, move):
 	msg = str(move.name) + " is charging"
 	return AddVolatileForMove(attacker, defender, move, False, move.key, msg)
 
-def OHKOonHit(target):
-	log.message("It's a one-hit KO!")
-
-def FAINTSELFonTry(attacker, defender, move):
-	attacker.fainted_self = True
-
 def AddVolatileForMove(attacker, defender, move, invulnerable, move_name, log_message):
 	if invulnerable:
 		if (attacker.remove_volatile(status.INVULNERABLE)) and (attacker.remove_volatile(status.TWOTURNMOVE)):
@@ -103,6 +97,14 @@ def AddVolatileForMove(attacker, defender, move, invulnerable, move_name, log_me
 		# return (False, " is gathering sunlight")
 		return False
 
+def OHKOonHit(target):
+	log.message("It's a one-hit KO!")
+
+def FAINTSELFonTry(attacker, defender, move):
+	attacker.fainted_self = True
+
+def CONVERSIONonTry(attacker, defender, move):
+	attacker.types = defender.types
 
 ### TODO: add all special cases into this function. theres alot
 def get_all_moves_from_json():
@@ -180,6 +182,11 @@ def get_all_moves_from_json():
 			elif 'faint' in description and 'user' in description:
 				onTry = FAINTSELFonTry
 
+			# One-off special cases
+			elif key == 'CONVERSION':
+				onTry = CONVERSIONonTry
+
+
 
 		### Still need:
 		# Bide
@@ -189,7 +196,6 @@ def get_all_moves_from_json():
 		# double-edge
 		# dragon rage
 		# dream eater
-		# explosion
 		# focus energy
 		# Haze
 		# high jump Kick
@@ -205,7 +211,6 @@ def get_all_moves_from_json():
 		# Recover
 		# reflect
 		# Seismic Toss
-		# self-Destruct
 		# Soft-boiled
 		# sonic Boom
 		# Struggle
