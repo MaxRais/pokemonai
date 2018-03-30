@@ -62,6 +62,9 @@ def RESTonHit(target):
 	target.heal(target.max_hp)
 	target.status_counter = 3
 
+def HEALonTry(attacker, defender, move):
+	attacker.heal(attacker.max_hp / 2)
+
 def DIGonTry(attacker, defender, move):
 	msg = attacker.template.species + " burrowed its way underground"
 	return AddVolatileForMove(attacker, defender, move, True, "DIG", msg)
@@ -148,6 +151,8 @@ def get_all_moves_from_json():
 			elif 'lowers' in description or 'lower' in description:
 				boosts = get_boosts(description, False)
 				target = FOE
+			elif 'heals' in description:
+				onTry = HEALonTry
 			else:
 				status = get_status_effect(description)
 				if status == 'PSN' and name_no_dash == 'TOXIC':
@@ -190,7 +195,6 @@ def get_all_moves_from_json():
 
 		### Still need:
 		# Bide
-		# Conversion
 		# counter
 		# disable
 		# double-edge
@@ -208,10 +212,8 @@ def get_all_moves_from_json():
 		# mist (This one seems like a doozy)
 		# Psywave
 		# Rage
-		# Recover
 		# reflect
 		# Seismic Toss
-		# Soft-boiled
 		# sonic Boom
 		# Struggle
 		# Supersonic
