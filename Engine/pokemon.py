@@ -24,6 +24,7 @@ def get_hp_element(ivs):
 class Pokemon:
 	def __init__(self, species, level, ivs, evs, techniques, gender): # had to rename init variable "moves" to "techniques" to solve a naming conflict
 		self.template = pokedex.pokedex_list[species]
+		self.name = species
 		self.types = self.template.elements
 		self.level = level
 		self.max_hp = int((((ivs[0] + (2 * self.template.base_hp) + int(evs[0] / 4) + 100) * level) / 100) + 10)

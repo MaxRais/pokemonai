@@ -7,6 +7,7 @@ import pokemon
 import typechart
 import sys
 import log
+import copy
 
 dbflag = False
 
@@ -22,6 +23,20 @@ class Battle:
 		self.active2 = None
 		self.turncount = 0
 		self.turnlimit = turnlimit
+
+	def clone(self):
+		battle_copy = copy.deepcopy(self)
+		team1copy = battle_copy.team1.clone()
+		team2copy = battle_copy.team2.clone()
+		player1copy = battle_copy.player1.clone()
+		player2copy = battle_copy.player2.clone()
+		battle_copy.team1 = team1copy
+		battle_copy.team2 = team2copy
+		battle_copy.player1 = player1copy
+		battle_copy.player2 = player2copy
+
+		return battle_copy
+
 
 	# Determines the winner ID of the battle, returns None if no one wins
 	def get_winner(self):
@@ -375,8 +390,38 @@ class Battle:
 			if (self.get_winner() != None):
 				return self.get_winner()
 
+	def get_player1_choices(self):
+		possible_choices = []
+		for pokemon in self.team1.pokemon:
+			if (pokemon.fainted == False and pokemon.is_active == False and pokemon.template.species != self.active1.template.species):
+				possible_choices.append(player.Action(player.SWITCH, self.active1, pokemon))
 
-	def play_turn(self, player1action, player2action):
+		# Only using damaging moves now to keep it simple
+		for move in self.active1.moves:
+			if move.pp > 0 and move.category != 'STATUS':
+				possible_choices.append(player.Action(player.ATTACK, self.active1, move))
+		return possible_choices
+
+	def get_player2_choices(self):
+		possible_choices = []
+		for pokemon in self.team2.pokemon:
+			if (pokemon.fainted == False and pokemon.is_active == False and pokemon.template.species != self.active2.template.species):
+				possible_choices.append(player.Action(player.SWITCH, self.active2, pokemon))
+
+		# Only using damaging moves now to keep it simple
+		for move in self.active2.moves:
+			if move.pp > 0 and move.category != 'STATUS':
+				possible_choices.append(player.Action(player.ATTACK, self.active2, move))
+		return possible_choices
+
+
+	def play_turn(self, player1action, player2action, show_logs = True):
+		if show_logs:
+			log.message = log.do_print
+		else:
+			log.message = log.dont_print
+
+		self.turncount += 1
 		# both players switch (order doesn't matter)
 		if (player1action.action == player.SWITCH and player2action.action == player.SWITCH):
 			self.switch(player1action.user, player1action.target)
@@ -480,5 +525,7 @@ class Battle:
 		else:
 			self.active2.status.onResidual(self.active2)
 			self.active1.status.onResidual(self.active1)
+
+		log.message = log.do_print
 
 		return self.get_winner()

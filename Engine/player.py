@@ -1,6 +1,8 @@
 import battle as battle_sim
 import status
 import fakerandom
+import copy
+import moves
 
 # actions
 SWITCH = "SWITCH"
@@ -27,6 +29,11 @@ class Player:
 		self.active = pokemon
 	def get_fainted_switch(self, battle):
 		pass
+	def clone(self):
+		player_copy = copy.deepcopy(self)
+		player_copy.team = player_copy.team.clone()
+		player_copy.active = copy.deepcopy(player_copy.active)
+		return player_copy
 
 # Random AI
 class RandomAI(Player):
@@ -174,19 +181,19 @@ class MinimaxAI(Player):
 				decision_vars = pokemon.get_decision_vars()
 				decision_vars.print_min_decision_vars()
 		while True:
-			possible_choices = self.get_possible_choices()
+			possible_choices = self.get_possible_choices(battle)
 
 			# do minimax here, now that we have possible choices
 			best_action = possible_choices[0]
 			best_val = -float('inf')
 			for action in possible_choices:
-				battle_copy = battle_sim.Battle(battle.team1, battle.team2, battle.player1, battle.player2)
-				#val = minimax(newBoard, !whiteTurn, ALPHABETA_MAX_DEPTH, 0, Integer.MAX_VALUE, -Integer.MAX_VALUE);
-				#if (val > best_val):
-				#	best_action = action;
-				#	best_val = val;
+				val = self.opponent_minimax(battle, 1, 0, 100000000, -100000000, action)
+				if val > best_val:
+					print 'new best!'
+					best_action = action
+					best_val = val
 
-			return fakerandom.fakechoice(possible_choices) # return best_action
+			return best_action
 	def set_active(self, pokemon):
 		self.active = pokemon
 	def get_fainted_switch(self, battle):
@@ -205,18 +212,16 @@ class MinimaxAI(Player):
 				decision_vars = pokemon.get_decision_vars()
 				decision_vars.print_min_decision_vars()
 		while True:
+			### TODO: dont forget to add minimax here as well
 			possible_choices = []
 			for pokemon in self.team.pokemon:
 				if (pokemon.fainted == False):
 					possible_choices.append(pokemon)
 			return fakerandom.fakechoice(possible_choices)
 
-	def minimax(self, battle, my_turn, max_depth, depth, alpha, beta):
+	def self_minimax(self, battle, max_depth, depth, alpha, beta):
 		game_over = battle.get_winner() != None
-		max = my_turn
-		not_my_id = battle.player2.get_id() if battle.player1.get_id() == self.get_id() else battle.player1.get_id()
-
-		turn_id = self.get_id() if my_turn else not_my_id
+		turn_id = self.get_id()
 
 		if depth >= max_depth:
 			return self.evaluate(battle)
@@ -226,58 +231,78 @@ class MinimaxAI(Player):
 			else:
 				return -self.win_val
 
-		best_move_val = self.win_val * -1 if max else 1
-		for action in self.get_possible_choices(): #need to fix this function but this is basically pseudocode for now
-			battle_copy = battle_sim.Battle(battle.team1, battle.team2, battle.player1, battle.player2)
-			#play move
-			val = self.minimax(battle_copy, not my_turn, max_depth, depth+1, alpha, beta)
-			if max:
-				best_move_val = max(val, best_move_val)
-				if best_move_val >= beta:
-					return best_move_val
-				alpha = max(best_move_val, alpha)
-			else:
-				best_move_val = min(val, best_move_val)
-				if best_move_val <= alpha:
-					return best_move_val
-				beta = min(best_move_val, beta)
+		best_move_val = self.win_val * -1
+		possible_choices = self.get_opponent_choices(battle)
+		for action in possible_choices:
+			# pass each action to the opponent for it to play out the turn and pick the minimum value
+			val = self.opponent_minimax(battle, max_depth, depth, alpha, beta, action)
+			best_move_val = max(val, best_move_val)
+			if best_move_val >= beta:
+				return best_move_val
+			alpha = max(best_move_val, alpha)
 
 		return best_move_val
+
+	def opponent_minimax(self, battle, max_depth, depth, alpha, beta, action):
+		game_over = battle.get_winner() != None
+		not_my_id = battle.player2.get_id() if battle.player1.get_id() == self.get_id() else battle.player1.get_id()
+		turn_id = not_my_id
+
+		if game_over:
+			if battle.get_winner() == turn_id:
+				return self.win_val
+			else:
+				return -self.win_val
+
+		best_move_val = self.win_val
+		opponent_choices = self.get_opponent_choices(battle)
+
+		for opponent_action in opponent_choices:
+			# skip opponent switching for now
+			if opponent_action.action == SWITCH:
+				continue
+
+			battle_copy = battle.clone()
+			isPlayer1 = battle.player1.get_id() == self.get_id()
+
+			# play out each action against the given action
+			if isPlayer1:
+				battle.play_turn(action, opponent_action, False)
+			else:
+				battle.play_turn(opponent_action, action, False)
+
+			print 'ME: ' + action.user.template.species + ' ' + action.action + ' ' + action.target.name
+			print 'THEM: ' + opponent_action.user.template.species + ' ' + opponent_action.action + ' ' + opponent_action.target.name
+			# pass it back to the main player to start the next turn
+			val = self.self_minimax(battle, max_depth, depth + 1, alpha, beta)
+			best_move_val = min(val, best_move_val)
+			if best_move_val <= alpha:
+				return best_move_val
+			beta = min(best_move_val, beta)
+			battle = battle_copy
 
 	# needs to be more complicated/better
 	def evaluate(self, battle):
 		my_sum = 0
 		their_sum = 0
 		isPlayer1 = battle.player1.get_id() == self.get_id()
-		for pokemon in battle.player1.team:
+		for pokemon in battle.team1.pokemon:
 			if isPlayer1:
 				my_sum += pokemon.hp
 			else:
 				their_sum += pokemon.hp
-		for pokemon in battle.player2.team:
+		for pokemon in battle.team2.pokemon:
 			if not isPlayer1:
 				my_sum += pokemon.hp
 			else:
 				their_sum += pokemon.hp
+		print str(my_sum-their_sum)
 		return my_sum - their_sum
 
-	def get_possible_choices(self):
-		possible_choices = []
-		for pokemon in self.team.pokemon:
-			if (pokemon.fainted == False and pokemon.is_active == False):
-				possible_choices.append(Action(SWITCH, self.active, pokemon))
-		for move in self.active.moves:
-			if (move.pp > 0):
-				possible_choices.append(Action(ATTACK, self.active, move))
-		return possible_choices
+	def get_possible_choices(self, battle):
+		isPlayer1 = battle.player1.get_id() == self.get_id()
+		return battle.get_player1_choices() if isPlayer1 else battle.get_player2_choices()
 
 	def get_opponent_choices(self, battle):
-		possible_choices = []
 		isPlayer1 = battle.player1.get_id() == self.get_id()
-		for pokemon in battle.team1.pokemon if isPlayer1 else battle.team2.pokemon:
-			if (pokemon.fainted == False and pokemon.is_active == False):
-				possible_choices.append(Action(SWITCH, self.active, pokemon))
-		for move in self.active.moves:
-			if (move.pp > 0):
-				possible_choices.append(Action(ATTACK, self.active, move))
-		return possible_choices
+		return battle.get_player2_choices() if isPlayer1 else battle.get_player1_choices()

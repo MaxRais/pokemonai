@@ -16,4 +16,4 @@ if (__name__ == "__main__"):
 	main("./Engine/tests/testteam.txt",
 		 "./Engine/tests/testteam.txt",
 		 player.HumanPlayer("player 1"),
-		 player.RandomAI("player 2")) #player.MinimaxAI("player 2"))
+		 player.MinimaxAI("player 2"))

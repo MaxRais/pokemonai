@@ -20,6 +20,7 @@ class PokemonDecisionVars:
 		self.move2 = moves[1]
 		self.move3 = moves[2]
 		self.move4 = moves[3]
+
 	def print_full_decision_vars(self):
 		print "self.species: " + str(self.template.species)
 		print "self.elements: " + str(self.types)
