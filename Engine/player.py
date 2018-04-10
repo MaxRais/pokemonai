@@ -34,6 +34,9 @@ class Player:
 		player_copy.team = player_copy.team.clone()
 		player_copy.active = copy.deepcopy(player_copy.active)
 		return player_copy
+	def json_out(self):
+		player_status = {}
+		player_status["ID"] = self.ID
 
 # Random AI
 class RandomAI(Player):

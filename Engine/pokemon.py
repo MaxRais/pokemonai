@@ -22,18 +22,19 @@ def get_hp_element(ivs):
 
 # Represents a pokemon
 class Pokemon:
-	def __init__(self, species, level, ivs, evs, techniques, gender): # had to rename init variable "moves" to "techniques" to solve a naming conflict
+	def __init__(self, species, level, gender, ivs=None, evs=None, techniques=None): # had to rename init variable "moves" to "techniques" to solve a naming conflict
 		self.template = pokedex.pokedex_list[species]
 		self.name = species
 		self.types = self.template.elements
 		self.level = level
-		self.max_hp = int((((ivs[0] + (2 * self.template.base_hp) + int(evs[0] / 4) + 100) * level) / 100) + 10)
-		self.hp = self.max_hp
-		self.attack = int(((((ivs[1] + (2 * self.template.base_atk) + int(evs[1] / 4)) * level) / 100) + 5))
-		self.defence = int(((((ivs[2] + (2 * self.template.base_def) + int(evs[2] / 4)) * level) / 100) + 5))
-		self.spattack = int(((((ivs[3] + (2 * self.template.base_spa) + int(evs[3] / 4)) * level) / 100) + 5))
-		self.spdefence = int(((((ivs[4] + (2 * self.template.base_spd) + int(evs[4] / 4)) * level) / 100) + 5))
-		self.speed = int(((((ivs[5] + (2 * self.template.base_spe) + int(evs[5] / 4)) * level) / 100) + 5))
+		if ivs is not None:
+			self.max_hp = int((((ivs[0] + (2 * self.template.base_hp) + int(evs[0] / 4) + 100) * level) / 100) + 10)
+			self.hp = self.max_hp
+			self.attack = int(((((ivs[1] + (2 * self.template.base_atk) + int(evs[1] / 4)) * level) / 100) + 5))
+			self.defence = int(((((ivs[2] + (2 * self.template.base_def) + int(evs[2] / 4)) * level) / 100) + 5))
+			self.spattack = int(((((ivs[3] + (2 * self.template.base_spa) + int(evs[3] / 4)) * level) / 100) + 5))
+			self.spdefence = int(((((ivs[4] + (2 * self.template.base_spd) + int(evs[4] / 4)) * level) / 100) + 5))
+			self.speed = int(((((ivs[5] + (2 * self.template.base_spe) + int(evs[5] / 4)) * level) / 100) + 5))
 
 		self.atk_stage = 0
 		self.def_stage = 0
@@ -74,14 +75,15 @@ class Pokemon:
 		self.hp_power = 60
 
 		self.moves = [None, None, None, None]
-		self.moves[0] = copy.deepcopy(moves.battle_move[techniques[0][0]])
-		self.moves[0].pp += int(self.moves[0].pp * techniques[0][1] * 0.2)
-		self.moves[1] = copy.deepcopy(moves.battle_move[techniques[1][0]])
-		self.moves[1].pp += int(self.moves[1].pp * techniques[1][1] * 0.2)
-		self.moves[2] = copy.deepcopy(moves.battle_move[techniques[2][0]])
-		self.moves[2].pp += int(self.moves[2].pp * techniques[2][1] * 0.2)
-		self.moves[3] = copy.deepcopy(moves.battle_move[techniques[3][0]])
-		self.moves[3].pp += int(self.moves[3].pp * techniques[3][1] * 0.2)
+		if techniques is not None:
+			self.moves[0] = copy.deepcopy(moves.battle_move[techniques[0][0]])
+			self.moves[0].pp += int(self.moves[0].pp * techniques[0][1] * 0.2)
+			self.moves[1] = copy.deepcopy(moves.battle_move[techniques[1][0]])
+			self.moves[1].pp += int(self.moves[1].pp * techniques[1][1] * 0.2)
+			self.moves[2] = copy.deepcopy(moves.battle_move[techniques[2][0]])
+			self.moves[2].pp += int(self.moves[2].pp * techniques[2][1] * 0.2)
+			self.moves[3] = copy.deepcopy(moves.battle_move[techniques[3][0]])
+			self.moves[3].pp += int(self.moves[3].pp * techniques[3][1] * 0.2)
 
 		self.status_counter = 0
 		self.volatiles = []
@@ -89,9 +91,85 @@ class Pokemon:
 		self.invulnerable_source = None
 		self.fainted_self = False
 
-		partiallytrapped_count = 0
-		partiallytrapped_source = None
-		reflect_countdown = 0
+		self.partiallytrapped_count = 0
+		self.partiallytrapped_source = None
+		self.reflect_countdown = 0
+
+	def json_out(self):
+		poke_state = {}
+		#DON'T NEED: poke_state["template"] = self.template
+		poke_state["name"] = self.name
+		poke_state["level"] = self.level
+		poke_state["max_hp"] = self.max_hp
+		poke_state["hp"] = self.hp
+		poke_state["attack"] = self.attack
+		poke_state["defence"] = self.defence
+		poke_state["spattack"] = self.spattack
+		poke_state["spdefence"] = self.spdefence
+		poke_state["speed"] = self.speed
+
+		poke_state["atk_stage"] = self.atk_stage
+		poke_state["def_stage"] = self.def_stage
+		poke_state["spa_stage"] = self.spa_stage
+		poke_state["spd_stage"] = self.spd_stage
+		poke_state["spe_stage"] = self.spe_stage
+
+		poke_state["acc_stage"] = self.acc_stage
+		poke_state["eva_stage"] = self.eva_stage
+		poke_state["crit_stage"] = self.crit_stage
+
+		poke_state["status"] = self.status.json_out()
+
+		poke_state["status_source"] = self.status_source
+
+		poke_state["gender"] = self.gender
+
+		poke_state["trapped"] = self.trapped
+		poke_state["maybe_trapped"] = self.maybe_trapped
+		poke_state["maybe_disabled"] = self.maybe_disabled
+		poke_state["illusion"] = self.illusion
+		poke_state["fainted"] = self.fainted
+		poke_state["faint_queued"] = self.faint_queued
+		poke_state["last_item"] = self.last_item
+		poke_state["ate_berry"] = self.ate_berry
+		poke_state["position"] = self.position
+		poke_state["last_move"] = self.last_move
+		poke_state["move_this_turn"] = self.move_this_turn
+		poke_state["last_damage"] = self.last_damage
+		poke_state["last_attacked_by"] = self.last_attacked_by
+		poke_state["used_item_this_turn"] = self.used_item_this_turn
+		poke_state["newly_switched"] = self.newly_switched
+		poke_state["being_called_back"] = self.being_called_back
+		poke_state["is_active"] = self.is_active
+		poke_state["is_started"] = self.is_started
+		poke_state["transformed"] = self.transformed
+		poke_state["during_move"] = self.during_move
+		poke_state["hp_element"] = self.hp_element
+		poke_state["hp_power"] = self.hp_power
+
+		poke_state["moves"] = [None, None, None, None]
+		poke_state["moves"][0] = self.moves[0].json_out()
+		poke_state["moves"][1] = self.moves[1].json_out()
+		poke_state["moves"][2] = self.moves[2].json_out()
+		poke_state["moves"][3] = self.moves[3].json_out()
+
+		poke_state["move_pp"] = [0, 0, 0, 0]
+		poke_state["move_pp"][0] = self.moves[0].pp
+		poke_state["move_pp"][1] = self.moves[1].pp
+		poke_state["move_pp"][2] = self.moves[2].pp
+		poke_state["move_pp"][3] = self.moves[3].pp
+
+		poke_state["status_counter"] = self.status_counter
+		poke_state["volatiles"] = self.volatiles
+		poke_state["twoturnmove_source"] = self.twoturnmove_source
+		poke_state["invulnerable_source"] = self.invulnerable_source
+		poke_state["fainted_self"] = self.fainted_self
+
+		poke_state["partiallytrapped_count"] = self.partiallytrapped_count
+		poke_state["partiallytrapped_source"] = self.partiallytrapped_source
+		poke_state["reflect_countdown"] = self.reflect_countdown
+
+		return poke_state
 
 	def add_volatile(self, new_volatile, source = None):
 		retval = False
@@ -244,6 +322,77 @@ class Pokemon:
 	def get_decision_vars(self):
 		return ai.PokemonDecisionVars(self.fainted, self.template, self.types, self.max_hp, self.hp, self.status, self.volatiles, self.atk_stage, self.def_stage, self.spa_stage, self.spd_stage, self.spe_stage, self.acc_stage, self.eva_stage, self.crit_stage, self.moves)
 
+def json_in(poke_state):
+	# species, level, ivs, evs, techniques, gender
+
+	name = poke_state["name"]
+	level = poke_state["level"]
+	gender = poke_state["gender"]
+
+	p = Pokemon(name, level, gender)
+	p.max_hp = poke_state["max_hp"]
+	p.hp = poke_state["hp"]
+	p.attack = poke_state["attack"]
+	p.defence = poke_state["defence"]
+	p.spattack = poke_state["spattack"]
+	p.spdefence = poke_state["spdefence"]
+	p.speed = poke_state["speed"]
+
+
+	p.atk_stage = poke_state["atk_stage"]
+	p.def_stage = poke_state["def_stage"]
+	p.spa_stage = poke_state["spa_stage"]
+	p.spd_stage = poke_state["spd_stage"]
+	p.spe_stage = poke_state["spe_stage"]
+
+	p.acc_stage = poke_state["acc_stage"]
+	p.eva_stage = poke_state["eva_stage"]
+	p.crit_stage = poke_state["crit_stage"]
+
+	p.trapped = poke_state["trapped"]
+	p.maybe_trapped = poke_state["maybe_trapped"]
+	p.maybe_disabled = poke_state["maybe_disabled"]
+	p.illusion = poke_state["illusion"]
+	p.fainted = poke_state["fainted"]
+	p.faint_queued = poke_state["faint_queued"]
+	p.last_item = poke_state["last_item"]
+	p.ate_berry = poke_state["ate_berry"]
+	p.position = poke_state["position"]
+	p.last_move = poke_state["last_move"]
+	p.move_this_turn = poke_state["move_this_turn"]
+	p.last_damage = poke_state["last_damage"]
+	p.last_attacked_by = poke_state["last_attacked_by"]
+	p.used_item_this_turn = poke_state["used_item_this_turn"]
+	p.newly_switched = poke_state["newly_switched"]
+	p.being_called_back = poke_state["being_called_back"]
+	p.is_active = poke_state["is_active"]
+	p.is_started = poke_state["is_started"]
+	p.transformed = poke_state["transformed"]
+	p.during_move = poke_state["during_move"]
+	p.hp_element = poke_state["hp_element"]
+	p.hp_power = poke_state["hp_power"]
+
+	p.status_counter = poke_state["status_counter"]
+	p.volatiles = poke_state["volatiles"]
+	p.twoturnmove_source = poke_state["twoturnmove_source"]
+	p.invulnerable_source = poke_state["invulnerable_source"]
+	p.fainted_self = poke_state["fainted_self"]
+
+	p.partiallytrapped_count = poke_state["partiallytrapped_count"]
+	p.partiallytrapped_source = poke_state["partiallytrapped_source"]
+	p.reflect_countdown = poke_state["reflect_countdown"]
+
+	p.status = status.json_in(poke_state["status"])
+	p.status_source = poke_state["status_source"]
+
+	p.moves = [None, None, None, None]
+	p.moves[0] = moves.json_in(poke_state["moves"][0])
+	p.moves[1] = moves.json_in(poke_state["moves"][1])
+	p.moves[2] = moves.json_in(poke_state["moves"][2])
+	p.moves[3] = moves.json_in(poke_state["moves"][3])
+
+	return p
+
 # Returns one pokemon from a text file representation
 def get_pokemon_from_list(pokemonlist):
 	species = ""
@@ -389,4 +538,4 @@ def get_pokemon_from_list(pokemonlist):
 	if (hpev + atkev + defev + spaev + spdev + speev > 510):
 		debug.db(dbflag, "EV total out of range for " + species)
 		return None
-	return Pokemon(species, level, [hpiv, atkiv, defiv, spaiv, spdiv, speiv], [hpev, atkev, defev, spaev, spdev, speev], [(atk1, ppup1), (atk2, ppup2), (atk3, ppup3), (atk4, ppup4)], gender)
+	return Pokemon(species, level, gender, [hpiv, atkiv, defiv, spaiv, spdiv, speiv], [hpev, atkev, defev, spaev, spdev, speev], [(atk1, ppup1), (atk2, ppup2), (atk3, ppup3), (atk4, ppup4)])

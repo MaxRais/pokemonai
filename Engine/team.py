@@ -14,6 +14,20 @@ class Team:
 		team_copy = Team(pokemon_list)
 		return team_copy
 
+	def json_out(self):
+		team_state = [None, None, None, None, None, None]
+		poke_count = 0
+		for p in self.pokemon:
+			team_state[poke_count] = p.json_out()
+			poke_count += 1
+		return team_state
+
+def json_in(team_state):
+	pokemon_list = []
+	for p in team_state:
+		pokemon_list.append(pokemon.json_in(p))
+	return Team(pokemon_list)
+
 # Get 6 pokemon from text file
 def get_team_from_file(teamfile):
 	f = open(teamfile, 'r')

@@ -8,6 +8,8 @@ import typechart
 import sys
 import log
 import copy
+import json
+import team
 
 dbflag = False
 
@@ -37,6 +39,31 @@ class Battle:
 
 		return battle_copy
 
+	def json_out(self):
+		battle_state = {}
+		battle_state["team1"] = self.team1.json_out()
+		battle_state["team2"] = self.team2.json_out()
+		battle_state["player1"] = self.player1.json_out()
+		battle_state["player2"] = self.player2.json_out()
+		battle_state["active1"] = self.active1.json_out()
+		battle_state["active2"] = self.active2.json_out()
+		battle_state["turncount"] = self.turncount
+		battle_state["turnlimit"] = self.turnlimit
+		open("battle_state.txt", "w").close()
+		json.dump(battle_state, open("battle_state.txt", 'wb'), sort_keys=True, indent=4)
+
+	def json_in(self):
+		battle_state = json.load(open("battle_state.txt"))
+
+		self.team1 = team.json_in(battle_state["team1"])
+		self.team2 = team.json_in(battle_state["team2"])
+		self.player1.set_team(self.team1)
+		self.player2.set_team(self.team2)
+		self.active1 = pokemon.json_in(battle_state["active1"])
+		self.active2 = pokemon.json_in(battle_state["active2"])
+
+		self.turncount = battle_state["turncount"]
+		self.turnlimit = battle_state["turnlimit"]
 
 	# Determines the winner ID of the battle, returns None if no one wins
 	def get_winner(self):
@@ -519,12 +546,13 @@ class Battle:
 			debug.db(dbflag, "UNEXPECTED COMBINATION OF ACTIONS: " + str(player1action.action) + " and " + str(
 				player2action.action))
 
-		if (self.active1.status.onResidualOrder <= self.active2.status.onResidualOrder):
-			self.active1.status.onResidual(self.active1)
-			self.active2.status.onResidual(self.active2)
-		else:
-			self.active2.status.onResidual(self.active2)
-			self.active1.status.onResidual(self.active1)
+		if self.active1.status is not None and self.active2.status is not None:
+			if (self.active1.status.onResidualOrder <= self.active2.status.onResidualOrder):
+				self.active1.status.onResidual(self.active1)
+				self.active2.status.onResidual(self.active2)
+			else:
+				self.active2.status.onResidual(self.active2)
+				self.active1.status.onResidual(self.active1)
 
 		log.message = log.do_print
 

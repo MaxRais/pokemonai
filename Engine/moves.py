@@ -43,6 +43,17 @@ class BattleMoveTemplate:
 		self.element = kwargs.get("element", "TYPELESS")
 		self.num_hits = kwargs.get("num_hits", 0)
 
+	def json_out(self):
+		move_status = {}
+		move_status["key"] = self.key
+		move_status["pp"] = self.pp
+		return move_status
+
+def json_in(move_status):
+	move = battle_move[move_status["key"]]
+	move.pp = move_status["pp"]
+	return move
+
 # A stat/status modifier effect on a move
 class Modifier:
 	def __init__(self, chance, stat, target, amount = 0):
@@ -52,6 +63,13 @@ class Modifier:
 		self.amount = amount # number of levels stat increases/decreases, or if it's a status move, number of turns to be afflicted (e.g. rest=>3)
 	def to_string(self):
 		return str(self.chance) + '% ' + ' to change ' + self.stat + ' of ' + self.target + ' ' + str(self.amount) + ' stages'
+	def json_out(self):
+		modifier_state = {}
+		modifier_state["chance"] = self.chance
+		modifier_state["stat"] = self.stat
+		modifier_state["target"] = self.target
+		modifier_state["amount"] = self.amount
+		return modifier_state
 
 ### Special case methods below
 def RESTonHit(target):
@@ -225,6 +243,7 @@ def get_all_moves_from_json():
 			base_power=base_power,
 			category=category,
 			name=name,
+			key=key,
 			pp=pp,
 			priority=priority,
 			element=element,
