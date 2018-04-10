@@ -101,6 +101,6 @@ def make_random_team():
 		if gender_num >= counter and gender_num < counter + ratios[1]:
 			gender = 'FEMALE'
 
-		team.append(pokemon.Pokemon(species, level, ivs, evs, attacks, gender))
+		team.append(pokemon.Pokemon(species, level, gender, ivs, evs, attacks))
 
 	return Team(team)
