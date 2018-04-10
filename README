@@ -3,8 +3,17 @@ Max Rais & Theodore Tsapakos
 Pokemon Gen 1 AI using minimax & expectimax with alpha-beta pruning
 
 ***To run***
-python Engine/main.py
+-Navigate to root directory from command line
+-run ./main.py [AI type] (python version 2.7)
+-acceptable ai type arguments are: minimax, expectimax, or anything else for the random ai
 
+***To play***
+-Recommend expanding terminal window to max width/height
+-Under 'Opponent' you will see info about the pokemon you are against
+-Under 'Active Pokemon' you will see a pokemon name and some info about the pokemon including its 4 moves
+---Type the move name into the command line (exact spacing/caps) to use that move
+-Under 'Team' you will see info about your team of pokemon
+---Type the exact name of the pokemon on your team to switch out that pokemon with your active pokemon
 
 ***Credits***
 Kevin Gold Zhengxing Chen, Chandan Shankarappa - CS4150 Instructor
