@@ -31,7 +31,7 @@ if (__name__ == "__main__"):
 		elif ai == 'expectimax':
 			player2 = player.ExpectimaxAI("player 2")
 
-	main("",
+	main("", #./tests/testteam.txt
 		 "",
 		 player.HumanPlayer("player 1"),
 		 player2)

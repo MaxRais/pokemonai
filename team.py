@@ -41,17 +41,25 @@ def make_random_team():
 	pokemon_chosen = []
 	skipped_moves = ['BIDE','COUNTER','DISABLE','DOUBLEEDGE','DRAGONRAGE','DREAMEATER','FOCUSENERGY','HAZE','HIGHJUMPKICK','HYPERBEAM','JUMPKICK','LIGHTSCREEN','MIMIC','MINIMIZE','MIRRORMOVE','MIST','PSYWAVE','RAGE','REFLECT','SEISMICTOSS','SONICBOOM','STRUGGLE','SUPERSONIC','TRANSFORM','SKULLBASH','NIGHTSHADE']
 
+	# Until we have 6 pokemon
 	while len(team) < teamsize:
+		# choose a random pokemon from the pokedex (0-indexed)
 		pokedex_num = fakerandom.fakerandint(0, 150)
 		while pokedex_num in pokemon_chosen:
 			pokedex_num = fakerandom.fakerandint(0, 150)
 		species = pokedex.pokedex_list.keys()[pokedex_num]
 		pokemon_chosen.append(pokedex_num)
+
+		# skip ditto because we didnt implement transform
 		if species == 'DITTO':
 			continue
+
+		# set constants that we dont want to randomize
 		level = 100
 		ivs = [31, 31, 31, 31, 31, 31]
 		evs = [0, 0, 0, 0, 0, 0, 0]
+
+		# pick 4 attacks
 		attacks = []
 		attacks_chosen = []
 		learnset = learnsets.learnset_list[pokedex.pokedex_list.keys()[pokedex_num]]
@@ -61,10 +69,14 @@ def make_random_team():
 				attack_num = fakerandom.fakerandint(0, len(learnset)-1)
 			attacks_chosen.append(attack_num)
 			attack = learnset[attack_num]
+
+			#skip attacks we didnt implement
 			if attack in skipped_moves:
 				continue
 
 			attacks.append((attack, 3))
+
+		# pick gender based on pokemon's gender ratios
 		gender = None
 		ratios = pokedex.pokedex_list[species].gender_ratios
 		counter = 0
@@ -76,6 +88,7 @@ def make_random_team():
 			gender = 'FEMALE'
 
 		team.append(pokemon.Pokemon(species, level, ivs, evs, attacks, gender))
+
 	return Team(team)
 
 
