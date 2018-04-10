@@ -34,6 +34,8 @@ class Battle:
 		battle_copy.team2 = team2copy
 		battle_copy.player1 = player1copy
 		battle_copy.player2 = player2copy
+		battle_copy.active1 = copy.deepcopy(battle_copy.active1)
+		battle_copy.active2 = copy.deepcopy(battle_copy.active2)
 
 		return battle_copy
 
