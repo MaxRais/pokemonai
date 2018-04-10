@@ -63,6 +63,8 @@ class Battle:
 		self.player2.set_team(self.team2)
 		self.active1 = pokemon.json_in(battle_state["active1"])
 		self.active2 = pokemon.json_in(battle_state["active2"])
+		self.player1.active = self.active1
+		self.player2.active = self.active2
 
 		self.turncount = battle_state["turncount"]
 		self.turnlimit = battle_state["turnlimit"]

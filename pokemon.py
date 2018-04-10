@@ -319,8 +319,68 @@ class Pokemon:
 				return 1.5
 		return 1
 
-	def get_decision_vars(self):
-		return ai.PokemonDecisionVars(self.fainted, self.template, self.types, self.max_hp, self.hp, self.status, self.volatiles, self.atk_stage, self.def_stage, self.spa_stage, self.spd_stage, self.spe_stage, self.acc_stage, self.eva_stage, self.crit_stage, self.moves)
+	def print_full_decision_vars(self):
+		print "self.species: " + str(self.template.species)
+		print "self.elements: " + str(self.types)
+		print "self.max_hp: " + str(self.max_hp)
+		print "self.hp: " + str(self.hp)
+		if (self.status.name != "NONE"):
+			print "self.status: " + str(self.status.name)
+		if (self.volatiles != []):
+			print "self.volatiles: " + str(self.volatiles)
+		if (self.atk_stage != 0):
+			print "self.atk_stage: " + str(self.atk_stage)
+		if (self.def_stage != 0):
+			print "self.def_stage: " + str(self.def_stage)
+		if (self.spa_stage != 0):
+			print "self.spa_stage: " + str(self.spa_stage)
+		if (self.spd_stage != 0):
+			print "self.spd_stage: " + str(self.spd_stage)
+		if (self.spe_stage != 0):
+			print "self.spe_stage: " + str(self.spe_stage)
+		if (self.acc_stage != 0):
+			print "self.acc_stage: " + str(self.acc_stage)
+		if (self.eva_stage != 0):
+			print "self.eva_stage: " + str(self.eva_stage)
+		if (self.crit_stage != 0):
+			print "self.crit_stage: " + str(self.crit_stage)
+		print "self.move1: " + str(self.moves[0].name) + " pp: " + str(self.moves[0].pp) + "\t\tself.move2: " + str(self.moves[1].name) + " pp: " + str(self.moves[1].pp) + "\t\tself.move3: " + str(self.moves[2].name) + " pp: " + str(self.moves[2].pp) + "\t\tself.move4: " + str(self.moves[3].name) + " pp: " + str(self.moves[3].pp)
+	def print_opponent_decision_vars(self):
+		print "self.species: " + str(self.template.species)
+		print "self.elements: " + str(self.types)
+		print "self.max_hp: " + str(self.max_hp)
+		print "self.hp: " + str(self.hp)
+		if (self.status.name != "NONE"):
+			print "self.status: " + str(self.status.name)
+		if (self.volatiles != []):
+			print "self.volatiles: " + str(self.volatiles)
+		if (self.atk_stage != 0):
+			print "self.atk_stage: " + str(self.atk_stage)
+		if (self.def_stage != 0):
+			print "self.def_stage: " + str(self.def_stage)
+		if (self.spa_stage != 0):
+			print "self.spa_stage: " + str(self.spa_stage)
+		if (self.spd_stage != 0):
+			print "self.spd_stage: " + str(self.spd_stage)
+		if (self.spe_stage != 0):
+			print "self.spe_stage: " + str(self.spe_stage)
+		if (self.acc_stage != 0):
+			print "self.acc_stage: " + str(self.acc_stage)
+		if (self.eva_stage != 0):
+			print "self.eva_stage: " + str(self.eva_stage)
+		if (self.crit_stage != 0):
+			print "self.crit_stage: " + str(self.crit_stage)
+	def print_team_decision_vars(self):
+		print "self.species: " + str(self.template.species)
+		print "self.elements: " + str(self.types)
+		print "self.max_hp: " + str(self.max_hp)
+		print "self.hp: " + str(self.hp)
+		if (self.status.name != "NONE"):
+			print "self.status: " + str(self.status.name)
+		print "self.move1: " + str(self.moves[0].name) + " pp: " + str(self.moves[0].pp) + "\t\tself.move2: " + str(self.moves[1].name) + " pp: " + str(self.moves[1].pp) + "\t\tself.move3: " + str(self.moves[2].name) + " pp: " + str(self.moves[2].pp) + "\t\tself.move4: " + str(self.moves[3].name) + " pp: " + str(self.moves[3].pp)
+	def print_min_decision_vars(self):
+		print "self.species: " + str(self.template.species)
+		print "self.hp: " + str(self.hp)
 
 def json_in(poke_state):
 	# species, level, ivs, evs, techniques, gender
