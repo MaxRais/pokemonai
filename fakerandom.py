@@ -1,7 +1,7 @@
 import random
 
 # Seeded randomness class
-random.seed(1)
+#random.seed(1)
 
 def fakerandom():
 	return random.random()

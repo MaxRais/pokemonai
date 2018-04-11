@@ -427,10 +427,10 @@ class Battle:
 			if (pokemon.fainted == False and pokemon.is_active == False and pokemon.template.species != self.active1.template.species):
 				possible_choices.append(player.Action(player.SWITCH, self.active1, pokemon))
 
-		# Only using damaging moves now to keep it simple
 		for move in self.active1.moves:
-			if move.pp > 0 and move.category != 'STATUS':
+			if move.pp > 0:
 				possible_choices.append(player.Action(player.ATTACK, self.active1, move))
+
 		return possible_choices
 
 	def get_player2_choices(self):
@@ -439,10 +439,10 @@ class Battle:
 			if (pokemon.fainted == False and pokemon.is_active == False and pokemon.template.species != self.active2.template.species):
 				possible_choices.append(player.Action(player.SWITCH, self.active2, pokemon))
 
-		# Only using damaging moves now to keep it simple
 		for move in self.active2.moves:
-			if move.pp > 0 and move.category != 'STATUS':
+			if move.pp > 0:
 				possible_choices.append(player.Action(player.ATTACK, self.active2, move))
+
 		return possible_choices
 
 

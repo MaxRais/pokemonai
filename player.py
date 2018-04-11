@@ -188,12 +188,21 @@ class MinimaxAI(Player):
 			if (pokemon.fainted == False):
 				pokemon.print_min_decision_vars()
 		while True:
-			### TODO: dont forget to add minimax here as well
 			possible_choices = []
 			for pokemon in self.team.pokemon:
 				if (pokemon.fainted == False):
 					possible_choices.append(pokemon)
-			return fakerandom.fakechoice(possible_choices)
+
+					# do minimax here, now that we have possible choices
+					best_action = possible_choices[0]
+					best_val = -float('inf')
+					for action in possible_choices:
+						val = self.opponent_minimax(battle, 1, 0, 100000000, -100000000, action)
+						if val > best_val:
+							print 'new best!'
+							best_action = action
+							best_val = val
+			return best_action
 
 	def self_minimax(self, battle, max_depth, depth, alpha, beta):
 		game_over = battle.get_winner() != None
@@ -234,9 +243,6 @@ class MinimaxAI(Player):
 		opponent_choices = self.get_opponent_choices(battle)
 
 		for opponent_action in opponent_choices:
-			# skip opponent switching for now
-			if opponent_action.action == SWITCH:
-				continue
 
 			battle_copy = battle.clone()
 			isPlayer1 = battle.player1.get_id() == self.get_id()
@@ -259,21 +265,68 @@ class MinimaxAI(Player):
 
 	# needs to be more complicated/better
 	def evaluate(self, battle):
-		my_sum = 0
-		their_sum = 0
+		my_hp = 0
+		their_hp = 0
+		my_status = 0
+		their_status = 0
+		my_stats = 0
+		their_stats = 0
+		my_fainted = 0
+		their_fainted = 0
+
 		isPlayer1 = battle.player1.get_id() == self.get_id()
 		for pokemon in battle.team1.pokemon:
 			if isPlayer1:
-				my_sum += pokemon.hp
+				my_hp += pokemon.hp
+				my_stats += pokemon.atk_stage + pokemon.def_stage + pokemon.spe_stage + pokemon.spa_stage + pokemon.spe_stage + pokemon.acc_stage + pokemon.eva_stage + pokemon.crit_stage
+
+				if pokemon.fainted:
+					my_fainted += 1
+
+				if pokemon.status.name != "NONE":
+					my_status += 1
 			else:
-				their_sum += pokemon.hp
+				their_hp += pokemon.hp
+				their_stats += pokemon.atk_stage + pokemon.def_stage + pokemon.spe_stage + pokemon.spa_stage + pokemon.spe_stage + pokemon.acc_stage + pokemon.eva_stage + pokemon.crit_stage
+
+				if pokemon.fainted:
+					their_fainted += 1
+
+				if pokemon.status.name != "NONE":
+					their_status += 1
 		for pokemon in battle.team2.pokemon:
 			if not isPlayer1:
-				my_sum += pokemon.hp
+				my_hp += pokemon.hp
+				my_stats += pokemon.atk_stage + pokemon.def_stage + pokemon.spe_stage + pokemon.spa_stage + pokemon.spe_stage + pokemon.acc_stage + pokemon.eva_stage + pokemon.crit_stage
+
+				if pokemon.fainted:
+					my_fainted += 1
+
+				if pokemon.status.name != "NONE":
+					my_status += 1
 			else:
-				their_sum += pokemon.hp
-		print str(my_sum-their_sum)
-		return my_sum - their_sum
+				their_hp += pokemon.hp
+				their_stats += pokemon.atk_stage + pokemon.def_stage + pokemon.spe_stage + pokemon.spa_stage + pokemon.spe_stage + pokemon.acc_stage + pokemon.eva_stage + pokemon.crit_stage
+
+				if pokemon.fainted:
+					their_fainted += 1
+
+				if pokemon.status.name != "NONE":
+					their_status += 1
+
+		hp_diff = my_hp - their_hp
+		status_diff = my_status - their_status
+		stat_diff = my_stats - their_stats
+		fainted_diff = my_fainted - their_fainted
+
+		# 70 percent weight to hp
+		# 25 percent weight for status effects
+		# 5 percent weight to stat changes
+		# 10 bonus points per fainted pokemon
+		value = hp_diff * .7 + status_diff * .25 + stat_diff * .5 + fainted_diff * 10
+		print value
+
+		return value
 
 	def get_possible_choices(self, battle):
 		isPlayer1 = battle.player1.get_id() == self.get_id()
@@ -283,7 +336,7 @@ class MinimaxAI(Player):
 		isPlayer1 = battle.player1.get_id() == self.get_id()
 		return battle.get_player2_choices() if isPlayer1 else battle.get_player1_choices()
 
-# Minimax bot
+# Expectimax bot
 class ExpectimaxAI(Player):
 	def __init__(self, ID):
 		self.ID = ID
@@ -314,7 +367,7 @@ class ExpectimaxAI(Player):
 			best_action = possible_choices[0]
 			best_val = -float('inf')
 			for action in possible_choices:
-				val = self.opponent_minimax(battle, 1, 0, 100000000, -100000000, action)
+				val = self.opponent_expectimax(battle, 1, 0, 100000000, -100000000, action)
 				if val > best_val:
 					print 'new best!'
 					best_action = action
@@ -335,14 +388,23 @@ class ExpectimaxAI(Player):
 			if (pokemon.fainted == False):
 				pokemon.print_min_decision_vars()
 		while True:
-			### TODO: dont forget to add minimax here as well
 			possible_choices = []
 			for pokemon in self.team.pokemon:
 				if (pokemon.fainted == False):
 					possible_choices.append(pokemon)
-			return fakerandom.fakechoice(possible_choices)
 
-	def self_minimax(self, battle, max_depth, depth, alpha, beta):
+					# do minimax here, now that we have possible choices
+					best_action = possible_choices[0]
+					best_val = -float('inf')
+					for action in possible_choices:
+						val = self.opponent_expectimax(battle, 1, 0, 100000000, -100000000, action)
+						if val > best_val:
+							print 'new best!'
+							best_action = action
+							best_val = val
+			return best_action
+
+	def self_expectimax(self, battle, max_depth, depth, alpha, beta):
 		game_over = battle.get_winner() != None
 		turn_id = self.get_id()
 
@@ -358,7 +420,7 @@ class ExpectimaxAI(Player):
 		possible_choices = self.get_opponent_choices(battle)
 		for action in possible_choices:
 			# pass each action to the opponent for it to play out the turn and pick the minimum value
-			val = self.opponent_minimax(battle, max_depth, depth, alpha, beta, action)
+			val = self.opponent_expectimax(battle, max_depth, depth, alpha, beta, action)
 			best_move_val = max(val, best_move_val)
 			if best_move_val >= beta:
 				return best_move_val
@@ -367,15 +429,11 @@ class ExpectimaxAI(Player):
 		return best_move_val
 
 	# Expectimax probability node
-	def opponent_minimax(self, battle, max_depth, depth, alpha, beta, action):
+	def opponent_expectimax(self, battle, max_depth, depth, alpha, beta, action):
 		opponent_choices = self.get_opponent_choices(battle)
 
 		val = 0
 		for opponent_action in opponent_choices:
-			# skip opponent switching for now
-			if opponent_action.action == SWITCH:
-				continue
-
 			# Calc probability of action (needs improvement obviously)
 			probability = 1/len(opponent_choices)
 
@@ -391,27 +449,12 @@ class ExpectimaxAI(Player):
 			print 'ME: ' + action.user.template.species + ' ' + action.action + ' ' + action.target.name
 			print 'THEM: ' + opponent_action.user.template.species + ' ' + opponent_action.action + ' ' + opponent_action.target.name
 			# pass it back to the main player to start the next turn
-			val += self.self_minimax(battle, max_depth, depth + 1, alpha, beta) * probability
+			val += self.self_expectimax(battle, max_depth, depth + 1, alpha, beta) * probability
 			battle = battle_copy
 		return val
 
-	# needs to be more complicated/better/share it with minimax
 	def evaluate(self, battle):
-		my_sum = 0
-		their_sum = 0
-		isPlayer1 = battle.player1.get_id() == self.get_id()
-		for pokemon in battle.team1.pokemon:
-			if isPlayer1:
-				my_sum += pokemon.hp
-			else:
-				their_sum += pokemon.hp
-		for pokemon in battle.team2.pokemon:
-			if not isPlayer1:
-				my_sum += pokemon.hp
-			else:
-				their_sum += pokemon.hp
-		print str(my_sum-their_sum)
-		return my_sum - their_sum
+		return MinimaxAI(self.get_id()).evaluate(battle)
 
 	def get_possible_choices(self, battle):
 		isPlayer1 = battle.player1.get_id() == self.get_id()

@@ -132,7 +132,7 @@ def TOXonResidual(pokemon):
 	log.message(pokemon.template.species + " was hurt by poison")
 	pokemon.damage((pokemon.max_hp / 16) * pokemon.get_status_counter())
 
-def CONFUSIONonStart(target, source, sourceEffect):
+def CONFUSIONonStart(target):
 	# if (sourceEffect and source == "LOCKEDMOVE" and target.add_volatile(CONFUSION)):
 	if (target.add_volatile(CONFUSION)):
 		log.message(target.template.species + " became confused")
