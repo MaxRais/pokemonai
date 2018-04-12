@@ -444,22 +444,19 @@ class ExpectimaxAI(Player):
 		battle.json_in()
 		opponent_choices = self.get_opponent_choices(battle)
 
-		switches = 0
-		for opponent_action in action:
-			if opponent_action.action == SWITCH:
-				switches += 1
-
 		val = 0
 		for opponent_action in opponent_choices:
 			# Calc probability of action
 			if opponent_action.action == SWITCH:
-				probability = 1/switches
+				probability = 1/len(opponent_choices)
 			else:
 				accuracy = opponent_action.target.accuracy
 				if accuracy == 0:
 					accuracy = 100
 
-				probability = accuracy/100
+				accuracy /= 100
+
+				probability = 1/len(opponent_choices) * accuracy
 
 			isPlayer1 = battle.player1.get_id() == self.get_id()
 
