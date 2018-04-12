@@ -160,6 +160,7 @@ class MinimaxAI(Player):
 		for pokemon in self.team.pokemon:
 			if (pokemon.fainted == False and pokemon.is_active == False):
 				pokemon.print_min_decision_vars()
+		battle.json_out()
 		while True:
 			possible_choices = self.get_possible_choices(battle)
 
@@ -205,6 +206,7 @@ class MinimaxAI(Player):
 			return best_action
 
 	def self_minimax(self, battle, max_depth, depth, alpha, beta):
+		battle.json_in()
 		game_over = battle.get_winner() != None
 		turn_id = self.get_id()
 
@@ -229,6 +231,7 @@ class MinimaxAI(Player):
 		return best_move_val
 
 	def opponent_minimax(self, battle, max_depth, depth, alpha, beta, action):
+		battle.json_in()
 		game_over = battle.get_winner() != None
 		not_my_id = battle.player2.get_id() if battle.player1.get_id() == self.get_id() else battle.player1.get_id()
 		turn_id = not_my_id
@@ -243,8 +246,6 @@ class MinimaxAI(Player):
 		opponent_choices = self.get_opponent_choices(battle)
 
 		for opponent_action in opponent_choices:
-
-			battle_copy = battle.clone()
 			isPlayer1 = battle.player1.get_id() == self.get_id()
 
 			# play out each action against the given action
@@ -261,7 +262,6 @@ class MinimaxAI(Player):
 			if best_move_val <= alpha:
 				return best_move_val
 			beta = min(best_move_val, beta)
-			battle = battle_copy
 
 	# needs to be more complicated/better
 	def evaluate(self, battle):
@@ -360,6 +360,7 @@ class ExpectimaxAI(Player):
 		for pokemon in self.team.pokemon:
 			if (pokemon.fainted == False and pokemon.is_active == False):
 				pokemon.print_min_decision_vars()
+		battle.json_out()
 		while True:
 			possible_choices = self.get_possible_choices(battle)
 
@@ -405,6 +406,7 @@ class ExpectimaxAI(Player):
 			return best_action
 
 	def self_expectimax(self, battle, max_depth, depth, alpha, beta):
+		battle.json_in()
 		game_over = battle.get_winner() != None
 		turn_id = self.get_id()
 
@@ -430,6 +432,7 @@ class ExpectimaxAI(Player):
 
 	# Expectimax probability node
 	def opponent_expectimax(self, battle, max_depth, depth, alpha, beta, action):
+		battle.json_in()
 		opponent_choices = self.get_opponent_choices(battle)
 
 		val = 0
@@ -437,7 +440,6 @@ class ExpectimaxAI(Player):
 			# Calc probability of action (needs improvement obviously)
 			probability = 1/len(opponent_choices)
 
-			battle_copy = battle.clone()
 			isPlayer1 = battle.player1.get_id() == self.get_id()
 
 			# play out each action against the given action
@@ -450,7 +452,6 @@ class ExpectimaxAI(Player):
 			print 'THEM: ' + opponent_action.user.template.species + ' ' + opponent_action.action + ' ' + opponent_action.target.name
 			# pass it back to the main player to start the next turn
 			val += self.self_expectimax(battle, max_depth, depth + 1, alpha, beta) * probability
-			battle = battle_copy
 		return val
 
 	def evaluate(self, battle):

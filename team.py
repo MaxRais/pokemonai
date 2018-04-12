@@ -49,7 +49,7 @@ def get_team_from_file(teamfile):
 	return Team(team)
 
 # Makes a random team of 6 pokemon
-def make_random_team():
+def make_random_team(num):
 	teamsize = 6
 	team = []
 	pokemon_chosen = []
@@ -101,6 +101,6 @@ def make_random_team():
 		if gender_num >= counter and gender_num < counter + ratios[1]:
 			gender = 'FEMALE'
 
-		team.append(pokemon.Pokemon(species, level, gender, ivs, evs, attacks))
+		team.append(pokemon.Pokemon(species, level, gender, num, ivs, evs, attacks))
 
 	return Team(team)

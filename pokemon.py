@@ -22,11 +22,12 @@ def get_hp_element(ivs):
 
 # Represents a pokemon
 class Pokemon:
-	def __init__(self, species, level, gender, ivs=None, evs=None, techniques=None): # had to rename init variable "moves" to "techniques" to solve a naming conflict
+	def __init__(self, species, level, gender, player, ivs=None, evs=None, techniques=None): # had to rename init variable "moves" to "techniques" to solve a naming conflict
 		self.template = pokedex.pokedex_list[species]
 		self.name = species
 		self.types = self.template.elements
 		self.level = level
+		self.player = player
 		if ivs is not None:
 			self.max_hp = int((((ivs[0] + (2 * self.template.base_hp) + int(evs[0] / 4) + 100) * level) / 100) + 10)
 			self.hp = self.max_hp
@@ -95,11 +96,15 @@ class Pokemon:
 		self.partiallytrapped_source = None
 		self.reflect_countdown = 0
 
+	def __eq__(self, other):
+		return self.name == other.name and self.player == other.player
+
 	def json_out(self):
 		poke_state = {}
 		#DON'T NEED: poke_state["template"] = self.template
 		poke_state["name"] = self.name
 		poke_state["level"] = self.level
+		poke_state["player"] = self.player
 		poke_state["max_hp"] = self.max_hp
 		poke_state["hp"] = self.hp
 		poke_state["attack"] = self.attack
@@ -388,8 +393,9 @@ def json_in(poke_state):
 	name = poke_state["name"]
 	level = poke_state["level"]
 	gender = poke_state["gender"]
+	player = poke_state["player"]
 
-	p = Pokemon(name, level, gender)
+	p = Pokemon(name, level, gender, player)
 	p.max_hp = poke_state["max_hp"]
 	p.hp = poke_state["hp"]
 	p.attack = poke_state["attack"]

@@ -45,8 +45,6 @@ class Battle:
 		battle_state = {}
 		battle_state["team1"] = self.team1.json_out()
 		battle_state["team2"] = self.team2.json_out()
-		battle_state["player1"] = self.player1.json_out()
-		battle_state["player2"] = self.player2.json_out()
 		battle_state["active1"] = self.active1.json_out()
 		battle_state["active2"] = self.active2.json_out()
 		battle_state["turncount"] = self.turncount

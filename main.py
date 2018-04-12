@@ -6,11 +6,11 @@ import sys
 
 def main(team1file, team2file, team1player, team2player):
 	if team1file == '':
-		team1 = team.make_random_team()
+		team1 = team.make_random_team(1)
 	else:
 		team1 = team.get_team_from_file(team1file)
 	if team2file == '':
-		team2 = team.make_random_team()
+		team2 = team.make_random_team(2)
 	else:
 		team2 = team.get_team_from_file(team2file)
 
