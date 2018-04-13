@@ -89,14 +89,20 @@ class Battle:
 	# Switches between two pokemon
 	def switch(self, sw_out, sw_in):
 		if (sw_out == self.active1):
-			self.active1 = sw_in
-			sw_out.is_active = False
-			sw_in.is_active = True
+			self.active1.is_active = False
+			for p in self.team1.pokemon:
+				if sw_in == p:
+					self.active1 = p
+					p.is_active = True
+					break
 			log.message(self.player1.ID + " withdrew " + sw_out.template.species + " and sent out " + sw_in.template.species)
 		else:
-			self.active2 = sw_in
-			sw_out.is_active = False
-			sw_in.is_active = True
+			self.active2.is_active = False
+			for p in self.team2.pokemon:
+				if sw_in == p:
+					self.active2 = p
+					p.is_active = True
+					break
 			log.message(self.player2.ID + " withdrew " + sw_out.template.species + " and sent out " + sw_in.template.species)
 		sw_in.status.onSwitchIn()
 		if (sw_out == self.player1.active):
