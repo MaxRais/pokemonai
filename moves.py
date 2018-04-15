@@ -127,7 +127,6 @@ def FAINTSELFonTry(attacker, defender, move):
 def CONVERSIONonTry(attacker, defender, move):
 	attacker.types = defender.types
 
-### TODO: add all special cases into this function. theres alot
 def get_all_moves_from_json():
 	result = {}
 	i = 0
@@ -200,7 +199,7 @@ def get_all_moves_from_json():
 			elif 'high' in description and 'critical' in description:
 				critRatio = 2
 			elif 'ohkoes' in description:
-				base_power = sys.maxint
+				base_power = 100000000000
 				onHit = OHKOonHit
 			elif 'faint' in description and 'user' in description:
 				onTry = FAINTSELFonTry
@@ -208,34 +207,6 @@ def get_all_moves_from_json():
 			# One-off special cases
 			elif key == 'CONVERSION':
 				onTry = CONVERSIONonTry
-
-
-
-		### Still need:
-		# Bide
-		# counter
-		# disable
-		# double-edge
-		# dragon rage
-		# dream eater
-		# focus energy
-		# Haze
-		# high jump Kick
-		# hyper beam
-		# jump Kick
-		# light Screen
-		# Mimic
-		# Minimize
-		# Mirror move
-		# mist (This one seems like a doozy)
-		# Psywave
-		# Rage
-		# reflect
-		# Seismic Toss
-		# sonic Boom
-		# Struggle
-		# Supersonic
-		# transform
 
 		result[key] = BattleMoveTemplate(
 			num=num,

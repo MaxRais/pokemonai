@@ -150,7 +150,7 @@ def CONFUSIONonBeforeMove(pokemon, target = None, move = None):
 		# return (True,)
 		return True
 	log.message(pokemon.template.species + " hurt itself in confusion")
-	pokemon.damage(battle.get_damage(pokemon, pokemon, moves.hitself)) # need to make sure there's a typless move for confusion to simulate hitting itself
+	pokemon.damage(pokemon.max_hp / 10) # take 10% of HP
 	# return (False, CONFUSION)
 	return False
 

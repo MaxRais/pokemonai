@@ -118,7 +118,7 @@ class HumanPlayer(Player):
 					return Action(ATTACK, self.active, move)
 	def set_active(self, pokemon):
 		self.active = pokemon
-	def get_fainted_switch(self, battle):
+	def get_fainted_switch(self, battle, sim = False):
 		print (str(self.get_id()) + ": Your active Pokemon fainted, choose a Pokemon to switch in")
 		print ("\n\nOpponent")
 		if (battle.active1 == self.active):
@@ -130,6 +130,13 @@ class HumanPlayer(Player):
 			if (pokemon.fainted == False):
 				pokemon.print_team_decision_vars()
 				print ("\n")
+
+		if sim:
+			possible_choices = []
+			for pokemon in self.team.pokemon:
+				if (pokemon.fainted == False):
+					possible_choices.append(pokemon)
+			return fakerandom.fakechoice(possible_choices)
 		while True:
 			choice = raw_input("Type Pokemon name to switch to that Pokemon: ")
 			for pokemon in self.team.pokemon:
@@ -168,12 +175,14 @@ class MinimaxAI(Player):
 			best_action = possible_choices[0]
 			best_val = -float('inf')
 			for action in possible_choices:
+				battle.json_in()
 				val = self.opponent_minimax(battle, 1, 0, 100000000, -100000000, action)
 				if val > best_val:
 					print 'new best!'
 					best_action = action
 					best_val = val
 
+			battle.json_in()
 			return best_action
 	def set_active(self, pokemon):
 		self.active = pokemon
@@ -194,6 +203,7 @@ class MinimaxAI(Player):
 				if (pokemon.fainted == False):
 					possible_choices.append(Action(SWITCH, self.active, pokemon))
 
+			return fakerandom.fakechoice(possible_choices)
 			# do minimax here, now that we have possible choices
 			best_action = possible_choices[0]
 			best_val = -float('inf')
@@ -206,7 +216,6 @@ class MinimaxAI(Player):
 			return best_action.target
 
 	def self_minimax(self, battle, max_depth, depth, alpha, beta):
-		battle.json_in()
 		game_over = battle.get_winner() != None
 		turn_id = self.get_id()
 
@@ -231,7 +240,6 @@ class MinimaxAI(Player):
 		return best_move_val
 
 	def opponent_minimax(self, battle, max_depth, depth, alpha, beta, action):
-		battle.json_in()
 		game_over = battle.get_winner() != None
 		not_my_id = battle.player2.get_id() if battle.player1.get_id() == self.get_id() else battle.player1.get_id()
 		turn_id = not_my_id
@@ -246,10 +254,10 @@ class MinimaxAI(Player):
 		opponent_choices = self.get_opponent_choices(battle)
 
 		for opponent_action in opponent_choices:
+			battle.json_in()
 			if opponent_action.action == SWITCH:
 				continue
 
-			battle_copy = battle.clone()
 			isPlayer1 = battle.player1.get_id() == self.get_id()
 
 			# play out each action against the given action
@@ -333,7 +341,11 @@ class MinimaxAI(Player):
 		# 5 percent weight to stat changes
 		# 10 bonus points per fainted pokemon
 		value = hp_diff * 100 * .7 + status_diff * .25 + stat_diff * .5 + fainted_diff * 10
-		print value
+		print "HP: " + str(hp_diff)
+		print "STATUS: " + str(status_diff)
+		print "STATS: " + str(stat_diff)
+		print "FAINTED: " + str(fainted_diff)
+		print "EVAL: " + str(value)
 
 		return value
 

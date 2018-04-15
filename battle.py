@@ -552,7 +552,6 @@ class Battle:
 
 			if (self.get_winner() != None):
 				return
-
 		else:
 			debug.db(dbflag, "UNEXPECTED COMBINATION OF ACTIONS: " + str(player1action.action) + " and " + str(
 				player2action.action))
@@ -566,5 +565,8 @@ class Battle:
 				self.active1.status.onResidual(self.active1)
 
 		log.message = log.do_print
+
+		if show_logs:
+			self.json_out()
 
 		return self.get_winner()
