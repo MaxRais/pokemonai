@@ -174,7 +174,7 @@ def get_all_moves_from_json():
 				status = get_status_effect(description)
 				if status == 'PSN' and name_no_dash == 'TOXIC':
 					status = 'TOX'
-				secondary = [Modifier(100, status, FOE)]
+				secondary = [Modifier(100, status, SELF if key == 'REST' else FOE)]
 		else:
 			if 'lowers' in description or 'lower' in description:
 				boosts = get_boosts(description, False)

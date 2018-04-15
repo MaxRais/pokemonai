@@ -38,14 +38,14 @@ class BattleStatus:
 
 	def json_out(self):
 		battle_status_status = {}
-		battle_status_status["name"] = self.name
+		battle_status_status["name"] = 'NONE' if self.name == None else self.name
 		return battle_status_status
 
 def json_in(battle_status_status):
 	status = battle_status[battle_status_status["name"]]
 	return status
 
-# Status effect methods TODO: (some bugs/incomplete code here might need to come back to later)
+# Status effect methods
 def BRNonStart(target):#, source, sourceEffect):
 	# if (sourceEffect and source == "FLAME ORB" and target.set_status(BRN)):
 	if (target.set_status(BRN)):
