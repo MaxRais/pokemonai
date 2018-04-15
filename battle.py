@@ -104,7 +104,7 @@ class Battle:
 					p.is_active = True
 				if sw_out == p:
 					p.is_active = False
-					
+
 			log.message(self.player2.ID + " withdrew " + sw_out.template.species + " and sent out " + sw_in.template.species)
 		sw_in.status.onSwitchIn()
 		if (sw_out == self.player1.active):
@@ -402,6 +402,18 @@ class Battle:
 
 		# While the game is not over
 		while (self.get_winner() == None):
+			player1switchin = None
+			player2switchin = None
+			if (self.active1.fainted == True or self.active1.hp <= 0):
+				player1switchin = self.player1.get_fainted_switch(self)
+			if (self.active2.fainted == True or self.active2.hp <= 0):
+				player2switchin = self.player2.get_fainted_switch(self)
+			if (player1switchin != None):
+				self.switch(player1action.user, player1switchin)
+			if (player2switchin != None):
+				self.switch(player2action.user, player2switchin)
+
+
 			if self.active1.twoturnmove_source is None:
 				player1action = None
 				while (True):
@@ -540,17 +552,6 @@ class Battle:
 
 			if (self.get_winner() != None):
 				return
-
-			player1switchin = None
-			player2switchin = None
-			if (self.active1.fainted == True or self.active1.hp <= 0):
-				player1switchin = self.player1.get_fainted_switch(self)
-			if (self.active2.fainted == True or self.active2.hp <= 0):
-				player2switchin = self.player2.get_fainted_switch(self)
-			if (player1switchin != None):
-				self.switch(player1action.user, player1switchin)
-			if (player2switchin != None):
-				self.switch(player2action.user, player2switchin)
 
 		else:
 			debug.db(dbflag, "UNEXPECTED COMBINATION OF ACTIONS: " + str(player1action.action) + " and " + str(

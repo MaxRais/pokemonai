@@ -192,7 +192,7 @@ class MinimaxAI(Player):
 			possible_choices = []
 			for pokemon in self.team.pokemon:
 				if (pokemon.fainted == False):
-					possible_choices.append(pokemon)
+					possible_choices.append(Action(SWITCH, self.active, pokemon))
 
 			# do minimax here, now that we have possible choices
 			best_action = possible_choices[0]
@@ -203,7 +203,7 @@ class MinimaxAI(Player):
 					print 'new best!'
 					best_action = action
 					best_val = val
-			return best_action
+			return best_action.target
 
 	def self_minimax(self, battle, max_depth, depth, alpha, beta):
 		battle.json_in()
