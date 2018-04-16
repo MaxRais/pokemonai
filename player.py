@@ -255,8 +255,6 @@ class MinimaxAI(Player):
 			else:
 				battle.play_turn(opponent_action, action, False)
 
-			#print 'ME: ' + action.user.template.species + ' ' + action.action + ' ' + action.target.name
-			#print 'THEM: ' + opponent_action.user.template.species + ' ' + opponent_action.action + ' ' + opponent_action.target.name
 			# pass it back to the main player to start the next turn
 			val = self.self_minimax(battle, max_depth, depth + 1, alpha, beta)
 			best_move_val = min(val, best_move_val)
@@ -330,11 +328,6 @@ class MinimaxAI(Player):
 		# 5 percent weight to stat changes
 		# 100 bonus points per fainted pokemon
 		value = hp_diff * .7 + status_diff * 100 * .25 + stat_diff * 100 * .5 + fainted_diff * 100
-		#print "HP: " + str(hp_diff)
-		#print "STATUS: " + str(status_diff)
-		#print "STATS: " + str(stat_diff)
-		#print "FAINTED: " + str(fainted_diff)
-		#print "EVAL: " + str(value)
 
 		return value
 
@@ -458,8 +451,6 @@ class ExpectimaxAI(Player):
 			else:
 				battle.play_turn(opponent_action, action, False)
 
-			#print 'ME: ' + action.user.template.species + ' ' + action.action + ' ' + action.target.name
-			#print 'THEM: ' + opponent_action.user.template.species + ' ' + opponent_action.action + ' ' + opponent_action.target.name
 			# pass it back to the main player to start the next turn
 			val += self.self_expectimax(battle, max_depth, depth + 1, alpha, beta) * probability
 		return val
